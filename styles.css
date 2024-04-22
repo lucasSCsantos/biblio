@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+
+:root {
+	--colorRight: #456D1C;
+	--colorPlace: #C69E10;
+	--colorWrong: #6F6F6F;
+	--colorFG: #5C3817;
+	--colorDisabled: #5d3a19;
+	--colorKeyboard: rgb(126, 81, 39);
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	
+}
+
+body {
+	font-family: "Lilita One", sans-serif;
+	background-color: #F3EAE1;
+}
+
+#loading {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.loader {
+	width: 48px;
+	height: 48px;
+	border: 5px solid var(--colorFG);
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+h1 {
+	color: #333;
+}
+
+p {
+	color: #000;
+}
+
+/* DAQUI PRA BAIXO  */
+header {
+	display: flex;
+	justify-content: center;
+	padding: 0.6em 0;
+}
+
+main {
+	display: none;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	gap: 32px;
+	/* background-color: green; */
+}
+
+#board {
+	height: fit-content;
+	gap: 0.4em;
+	display: flex;
+	flex-direction: column;
+}
+
+#versicle {
+	padding: 1em 0 1em;
+	width: 32em;
+}
+
+#versicle-text {
+	text-align: center;
+	font-size: 1.4em;
+}
+
+.row {
+	display: flex;
+	height: 4em;
+	gap: 0.4em;
+	margin: 0;
+	align-items: center;
+}
+
+.letter {
+	width: 2em;
+	height: 100%;
+	border-radius: 4px;
+	color: black;
+	font-size: 32px;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0;
+	background-color: var(--colorFG);
+}
+
+.letter.disabled {
+	opacity: 0.3;
+	z-index: 0;
+	/* transition: 0.6s ease; */
+	background-color: var(--colorDisabled);
+}
+
+.empty {
+	border: 6px solid var(--colorFG);
+	background-color: transparent;
+}
+
+.focus {
+	border-bottom: 12px solid var(--colorFG);
+	border-radius: 6px;
+}
+
+.colon {
+	font-size: 48px;
+	margin-top: 0 !important;
+	padding: 0;
+}
+
+.parcial {
+	border: 6px solid var(--colorFG);
+	background-color: transparent;
+	--color: var(--colorPlace);
+	animation: flash 0.45s linear forwards;
+}
+
+.right {
+	border: 6px solid var(--colorFG);
+	background-color: transparent;
+	--color: var(--colorRight);
+	animation: flash 0.45s linear forwards;
+}
+
+.wrong {
+	border: 6px solid var(--colorFG);
+	background-color: transparent;
+	--color: var(--colorWrong);
+	animation: flash 0.45s linear forwards;
+}
+
+.win {
+	background-color: var(--colorRight);
+	animation-delay: 0s;
+	border: none;
+	animation: hithere 1s linear forwards;
+	z-index: 23;
+}
+
+.empty-animation {
+	animation: shake 0.55s ease forwards;
+}
+
+@keyframes shake {
+	0%, 100% {transform: translateX(0);}
+	10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
+	70%, 90% {transform: translateX(-2px);}
+	20%, 40%, 60%, 80% {transform: translateX(5px);}
+	80% {transform: translateX(2px);}
+}
+
+@keyframes hithere {
+  30% { transform: scale(1.1); }
+  40%, 60% { transform: rotate(-20deg) scale(1.1); }
+  50% { transform: rotate(20deg) scale(1.1); }
+  70% { transform: rotate(0deg) scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes flash {
+  0% {
+			background-color: transparent;
+			border: 6px solid var(--colorFG);
+			opacity: 1;
+	}
+
+	30% {
+			background-color: transparent;
+			border: 6px solid var(--colorFG);
+			opacity: 0;
+	}
+
+	70% {
+		background-color: transparent;
+		border: 6px solid var(--colorFG);
+		opacity: 0;
+	}
+
+	71% {
+		border: none;
+	}
+	
+	100% {
+		opacity: 1;
+		background-color: var(--color);
+		border: none;
+	}
+}
+
+#keyboard {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	bottom: 0.1em;
+	gap: 0.6em;
+	width: 100%;
+}
+
+#keyboard .keyboard-row {
+	height: 4rem;
+}
+ 
+#keyboard button {
+	width: 3rem;
+	height: 100%;
+	background-color: var(--colorKeyboard);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-family: "Lilita One", sans-serif;
+	font-size: 1em;
+	box-sizing: border-box;
+	padding: 0;
+}
+
+#kbd_enter {
+	width: 5em !important;
+}
+
+#keyboard img {
+	width: 2em;
+	height: 1em;
+}
+
+@media only screen and (max-width: 600px) {
+	.row {
+		height: 3em;
+	}
+
+	#versicle {
+		padding: 1em 0 1em;
+		width: 80%;
+	}
+
+	#versicle-text {
+		text-align: center;
+		font-size: 1.6em;
+	}
+
+	.letter {
+		width: 1.5em;
+		height: 100%;
+	}
+
+	#keyboard .keyboard-row {
+		height: 4rem;
+	}
+
+	#keyboard button {
+		width: 2rem;
+		font-size: 1em;
+	}
+}
