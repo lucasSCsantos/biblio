@@ -7,10 +7,6 @@
   Biblio
 </h1>
 
-<h1 align="center">
-  <img alt="Home" src="https://imgur.com/ivIB0bV.gif"/>
-</h1>
-
 # :page_with_curl: Sobre
 
 O biblio é um jogo diário, similar aos famosos Wordle e Termo, onde o objetivo é descobrir um versículo díario.
