@@ -47,4 +47,4 @@ Estou aqui para ajudar! Mande uma mensagem no GitHub ou um [e-mail](luc.cristova
 
 ## Agradecimentos:
 
-Um grande obrigado a meu amado Senhor Jesus Cristo ❤✟
+Obrigado meu Senhor, Jesus Cristo ❤✟
