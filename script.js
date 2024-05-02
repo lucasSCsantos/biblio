@@ -1,210 +1,7 @@
-
-let answer;
-
-window.onload = async () => {
-  const { book, chapter, verse } = getRandomVerse();
-
-	answer = getAnswer(book, chapter, verse);
-
-	const localVersicle = getItemUntilNextDay("day-versicle");
-	const game = getGame();
-
-	if (!game) {
-		setGame(answer, verse);
-	} else {
-		updateGame(game, answer, versicle);
-	}
-
-	generateTries(game.tries, game.won);
-
-  if (!localVersicle) {
-    const data = await fetch(
-      `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`,
-      {
-        headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdHIiOiJGcmkgRmViIDE2IDIwMjQgMTk6MTg6MDkgR01UKzAwMDAuNjVjZmI0NzliNDA4OTUwMDI4ZmZjOTlhIiwiaWF0IjoxNzA4MTExMDg5fQ.aiKnMPNwpIpTOqkLFQ2QN9kHaw4rPhqlNmkoiUAXrqs",
-        },
-      }
-    );
-
-		const versicle = await data.json();
-		
-		restartGame(game, answer, versicle.text);
-
-		setItemUntilNextDay("day-versicle", versicle.text);
-
-    document.getElementById("versicle-text").textContent = `"${versicle.text}"`;
-	} else {
-		document.getElementById("versicle-text").textContent = `"${localVersicle}"`;
-	}
-
-	stopLoading();
+const global = {
+  chances: 6,
+  boxes: 6,
 };
-
-function generateTries(tries, won) {
-	if (tries.length) {
-		const rows = document.querySelectorAll(".row");
-
-		rows.forEach((row, index) => {
-			if (tries[index]) {
-				row.querySelectorAll(".letter").forEach((letter, i) => {
-					letter.textContent = tries[index][i];
-
-					letter.setAttribute("style", "animation-duration: 0s");
-
-					if (answer.slice(i, i + 1) === letter.textContent) {
-						letter.classList.add("right");
-					} else if (answer.includes(letter.textContent)) {
-						letter.classList.add("parcial");
-					} else {
-						letter.classList.add("wrong");
-					};
-					letter.classList.remove("empty");
-
-					if (tries[index] !== answer) {
-						const nextRowLetters = rows[index + 1].querySelectorAll(".letter");
-						nextRowLetters.forEach((letter) => letter.classList.add("empty"));
-						nextRowLetters[0].classList.add("focus");
-					}
-				})
-			} else if (won) {
-				row.querySelectorAll(".letter").forEach((letter, i) => {
-					letter.classList.add("disabled");
-				});
-			}
-		})
-	}
-}
-
-document.body.addEventListener("keyup", (event) => {
-	const isNumber = /^\d$/;
-	const letters = document.querySelectorAll(".empty");
-	const letterIndex = Array.from(letters).findIndex((l) => l.classList.contains("focus"));
-	const response = Array.from(letters).map((l) => l.textContent).join("");
-
-
-	if (event.key === "ArrowRight" && letterIndex < letters.length - 1) {
-		letters[letterIndex].classList.remove("focus");
-		letters[letterIndex + 1].classList.add("focus");
-	}
-
-	if (event.key === "ArrowLeft" && letterIndex > 0 ) {
-    letters[letterIndex].classList.remove("focus");
-    letters[letterIndex - 1].classList.add("focus");
-	}
-
-	if (event.key === "ArrowLeft" && letterIndex === -1) {
-    letters[letters.length - 1].classList.add("focus");
-	}
-	
-	if (event.key === "Backspace" && letterIndex > 0 && !letters[letterIndex].textContent) {
-		letters[letterIndex].classList.remove("focus");
-		letters[letterIndex - 1].classList.add("focus");
-    letters[letterIndex - 1].textContent = "";
-	}
-
-	if (event.key === "Backspace" && letterIndex === -1) {
-    letters[letters.length - 1].textContent = "";
-    letters[letters.length - 1].classList.add("focus");
-  }
-	
-	if (event.key === "Backspace" && letterIndex > 0 && letters[letterIndex].textContent) {
-		letters[letterIndex].textContent = "";
-	}
-
-	if (
-		(event.code.includes("Key") || event.code.includes("Digit")) &&
-			letterIndex < letters.length &&
-			letterIndex !== -1
-	) {
-		if ((letterIndex >= 2 && isNumber.test(event.key)) || (letterIndex < 2 && !isNumber.test(event.key))) {
-			letters[letterIndex].textContent = event.key.toUpperCase();
-			letters[letterIndex].classList.remove("focus");
-
-			if (letterIndex < letters.length - 1) {
-				letters[letterIndex + 1].classList.add("focus");
-			}
-		}
-
-	}
-
-	if (event.key === "Enter" && response.length === letters.length) {
-		const books = Object.keys(bible).map((abbrv) => abbrv.toUpperCase());
-		const book = response.slice(0, 2);
-
-		if (!books.includes(book)) {
-			letters.forEach((letter) => {
-				letter.parentElement.classList.add("empty-animation");
-			});
-			setTimeout(() => {
-				letters.forEach((letter) => {
-					letter.parentElement.classList.remove("empty-animation");
-        });
-			}, 1000);
-			letters.forEach((letter) => letter.textContent = "");
-			letters[0].classList.add("focus");
-		} else if (response === answer) {
-			setTry(response, true);
-
-			let delay = 0;
-
-			letters.forEach((letter, index) => {
-        letter.setAttribute("style", `animation-delay: ${delay}s`);
-        delay = delay + 0.45;
-				letter.classList.add("right");
-        letter.classList.remove("empty");
-			});
-			
-			setTimeout(() => {
-				letters.forEach((letter) => {
-					letter.classList.add("win");
-        	letter.removeAttribute("style");
-				});
-				
-				document.querySelectorAll(".letter").forEach((letter) => {
-					if (!letter.classList.contains("win")) {
-						letter.classList.add("disabled")
-					}
-				});
-				
-      }, 450 * letters.length + 100);
-		} else {
-			setTry(response);
-
-			let delay = 0;
-
-			letters.forEach((letter, index) => {
-				letter.setAttribute("style", `animation-delay: ${delay}s`)
-				delay = delay + 0.45;
-				if (answer.slice(index, index + 1) === letter.textContent) {
-					letter.classList.add("right");
-				} else if (answer.includes(letter.textContent)) {
-					letter.classList.add("parcial");
-        } else {
-					letter.classList.add("wrong");
-        };
-				letter.classList.remove("empty");
-			})
-
-			setTimeout(() => {
-				const nextRowLetters = letters[0].parentElement.nextElementSibling.querySelectorAll(".letter");
-				nextRowLetters.forEach((letter) => letter.classList.add("empty"));
-				nextRowLetters[0].classList.add("focus");
-			}, 450 * letters.length + 100)
-		}
-	}
-
-	if (event.key === "Enter" && response.length !== letters.length) {
-		letters.forEach((letter) => {
-			letter.parentElement.classList.add("empty-animation");
-			setTimeout(() => {
-				letter.parentElement.classList.remove("empty-animation");
-			}, 1000)
-		})
-  }
-
-})
 
 const bible = {
   gn: [
@@ -1520,22 +1317,666 @@ const bible = {
   ],
 };
 
+async function startUp() {
+  const main = document.getElementById("game");
+
+  setState();
+
+  const { book, chapter, verse } = getRandomVerse();
+
+  setSecret(book, chapter, verse);
+
+  await drawVersicle(main, book, chapter, verse);
+
+  drawGrid(main, global.chances, global.boxes);
+
+  drawKeyboard(main);
+
+  keyboardEvent();
+
+  const state = getState();
+
+  if (state.won || state.gameOver) {
+    if (state.gameOver) showAnswer();
+    showStatsModal();
+  }
+}
+
+function updateState(key, value) {
+  const state = JSON.parse(localStorage.getItem("state"));
+
+  localStorage.setItem(
+    "state",
+    JSON.stringify({
+      ...state,
+      [key]: value,
+    })
+  );
+}
+
+function updateCurrentColumn(value) {
+  const state = JSON.parse(localStorage.getItem("state"));
+
+  localStorage.setItem(
+    "state",
+    JSON.stringify({
+      ...state,
+      currentColumn: value >= 0 ? value : state.currentColumn + 1,
+    })
+  );
+}
+
+function updateCurrentRow(value) {
+  const state = JSON.parse(localStorage.getItem("state"));
+
+  localStorage.setItem(
+    "state",
+    JSON.stringify({
+      ...state,
+      currentRow: value >= 0 ? value : state.currentRow + 1,
+    })
+  );
+}
+
+function setState() {
+  let tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  let timeUntilMidnight = tomorrow.getTime() - Date.now();
+
+  const state = JSON.parse(localStorage.getItem("state"));
+
+  if (!state || Date.now() >= state.expirationTime || !state.expirationTime) {
+    localStorage.setItem(
+      "state",
+      JSON.stringify({
+        currentRow: 0,
+        currentColumn: 0,
+        grid: Array(6)
+          .fill()
+          .map(() => Array(6).fill("")),
+        versicle: "",
+        won: false,
+        gameOver: false,
+        currentGame: getSequentialNumber(),
+        expirationTime: Date.now() + timeUntilMidnight,
+      })
+    );
+  }
+}
+
+function getState() {
+  return JSON.parse(localStorage.getItem("state"));
+}
+
+async function drawVersicle(container, book, chapter, verse) {
+  let { versicle: verseText } = getState();
+
+  if (!verseText) {
+    const data = await fetch(
+      `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`
+    );
+
+    const versicle = await data.json();
+    verseText = versicle.text;
+
+    updateState("answer", getAnswer(versicle));
+
+    updateState("versicle", versicle.text);
+  }
+
+  const versicleText = document.createElement("h2");
+  versicleText.textContent = `"${verseText}"`;
+
+  const versicleContainer = document.createElement("div");
+  versicleContainer.className = "versicle";
+
+  versicleContainer.appendChild(versicleText);
+
+  container.appendChild(versicleContainer);
+}
+
+function getAnswer(versicle) {
+  let answer = "";
+
+  answer += versicle.book.name + " ";
+  answer += versicle.chapter + ":";
+  answer += versicle.number;
+
+  return answer;
+}
+
+function keyboardEvent() {
+  document.body.onkeyup = (event) => {
+    const { currentColumn } = getState();
+    const isLetter = (key) => key.match(/[a-z]/i) && key.length === 1;
+    const isNumber = (key) => key.match(/^\d$/) && key.length === 1;
+
+    if (isLetter(event.key) && currentColumn < 2) {
+      addLetter(event.key);
+    }
+
+    if (
+      isNumber(event.key) &&
+      currentColumn >= 2 &&
+      currentColumn < global.boxes
+    ) {
+      addLetter(event.key);
+    }
+
+    if (event.key === "Backspace") {
+      removeLetter();
+    }
+
+    if (event.key === "Enter") {
+      onEnter();
+    }
+
+    updateBox();
+  };
+}
+
+function drawGrid(container, chances, boxes) {
+  const grid = document.createElement("div");
+
+  grid.className = "grid";
+
+  for (let i = 0; i < chances; i++) {
+    for (let j = 0; j < boxes; j++) {
+      const box = drawBox(i, j);
+
+      if (j === 1) {
+        box.classList.add("space");
+      }
+      if (j === 4) {
+        const colon = document.createElement("p");
+        colon.className = "colon";
+        colon.textContent = ":";
+        grid.appendChild(colon);
+      }
+      grid.appendChild(box);
+    }
+  }
+
+  container.appendChild(grid);
+}
+
+function drawBox(row, column) {
+  const { grid, secret, currentColumn, currentRow } = getState();
+  const box = document.createElement(`div`);
+  const letter = grid[row][column];
+  let updatedSecret = getUpdatedSecret();
+
+  box.className = "box";
+  box.id = `box${row}${column}`;
+
+  if (letter) {
+    box.textContent = letter;
+
+    if (grid[row][column] === secret[column]) {
+      box.classList.add("right");
+    } else if (updatedSecret.includes(letter)) {
+      box.classList.add("parcial");
+      updatedSecret[updatedSecret.indexOf(letter)] = "";
+    } else {
+      box.classList.add("wrong");
+    }
+  }
+
+  if (row === currentRow && column === currentColumn) {
+    box.classList.add("focus");
+  }
+
+  if (row === currentRow) {
+    box.classList.add("active");
+  }
+
+  return box;
+}
+
+function drawKeyboard(container) {
+  const keyboard = document.createElement("div");
+  keyboard.className = "keyboard";
+
+  const keys = [
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Backspace"],
+    ["Z", "X", "C", "V", "B", "N", "M", "Enter"],
+  ];
+
+  for (let i = 0; i < keys.length; i++) {
+    const keyboardRow = document.createElement("div");
+    keyboardRow.className = "keyboard-row";
+
+    for (const key of keys[i]) {
+      const keyButton = document.createElement("button");
+      keyButton.classList.add("key");
+      keyButton.id = key;
+      keyButton.textContent = key === "Backspace" ? "←" : key;
+
+      keyButton.onclick = () => keyboardClick(key);
+
+      keyboardRow.appendChild(keyButton);
+    }
+
+    keyboard.appendChild(keyboardRow);
+  }
+
+  container.appendChild(keyboard);
+}
+
+function updateKeyboard() {
+  const { currentRow, secret } = getState();
+
+  for (let i = 0; i < global.boxes; i++) {
+    const box = document.getElementById(`box${currentRow - 1}${i}`);
+    const letter = box.textContent;
+    const key = document.getElementById(letter);
+
+    if (letter === secret[i]) {
+      key.classList.add("key-right");
+    } else if (secret.includes(letter)) {
+      key.classList.add("key-parcial");
+    } else {
+      key.classList.add("key-wrong");
+    }
+  }
+}
+
+function keyboardClick(key) {
+  const event = new KeyboardEvent("keyup", { key: key });
+  document.body.dispatchEvent(event);
+}
+
+function addLetter(letter) {
+  const { currentColumn, currentRow, grid } = getState();
+
+  grid[currentRow][currentColumn] = letter.toUpperCase();
+
+  updateState("grid", grid);
+
+  if (currentColumn < global.boxes) updateCurrentColumn();
+}
+
+function onEnter() {
+  const { grid, currentRow } = getState();
+
+  const word = grid[currentRow];
+
+  if (!validateBook(word) || word.join("").length !== global.boxes) {
+    cleanRow();
+  } else {
+    revealWord(word);
+  }
+}
+
+function getUpdatedSecret() {
+  const { secret, currentRow } = getState();
+  let updatedSecret = [...secret];
+
+  for (let i = 0; i < global.boxes; i++) {
+    const letter =
+      document.getElementById(`box${currentRow}${i}`)?.textContent || "";
+
+    if (letter === secret[i]) {
+      updatedSecret[i] = "";
+    }
+  }
+
+  return updatedSecret;
+}
+
+function revealWord(guess) {
+  const { secret, currentRow, currentColumn } = getState();
+  const animationDelay = 500;
+  const finishDelay = (7 * animationDelay) / 2;
+  let updatedSecret = getUpdatedSecret();
+
+  for (let i = 0; i < global.boxes; i++) {
+    const box = document.getElementById(`box${currentRow}${i}`);
+    const letter = box.textContent;
+
+    setTimeout(() => {
+      if (letter === secret[i]) {
+        box.classList.add("right");
+      } else if (updatedSecret.includes(letter)) {
+        box.classList.add("parcial");
+        updatedSecret[updatedSecret.indexOf(letter)] = "";
+      } else {
+        box.classList.add("wrong");
+      }
+    }, ((i + 1) * animationDelay) / 2);
+
+    box.classList.add("animated");
+    box.style.animationDelay = `${(i * animationDelay) / 2}ms`;
+  }
+
+  setTimeout(() => {
+    updateKeyboard();
+  }, finishDelay);
+
+  const win = guess.join("") === secret.join("");
+  const gameOver = currentRow === 5;
+
+  if (win) {
+    setTimeout(() => {
+      setGameWin();
+      updateState("won", true);
+      updateStats();
+    }, finishDelay);
+    setTimeout(() => {
+      showStatsModal();
+    }, finishDelay + 1000);
+  } else if (gameOver) {
+    updateState("gameOver", true);
+    updateStats();
+    showStatsModal();
+    showAnswer();
+  } else {
+    setTimeout(() => {
+      changeActiveRow();
+    }, finishDelay);
+
+    updateCurrentRow();
+    updateCurrentColumn(0);
+  }
+}
+
+function updateStats() {
+  const stats = JSON.parse(localStorage.getItem("stats"));
+  const { won, gameOver, currentGame } = getState();
+
+  if (!stats) {
+    localStorage.setItem(
+      "stats",
+      JSON.stringify({
+        winStreak: won ? 1 : 0,
+        games: 1,
+        wins: won ? 1 : 0,
+        maxStreak: won ? 1 : 0,
+        lastWin: won ? currentGame : null,
+      })
+    );
+  } else {
+    const winStreak = gameOver ? 0 : stats.winStreak + ((won && stats.lastWin + 1 === currentGame) ? 1 : 0);
+    const maxStreak = stats.maxStreak > winStreak ? stats.maxStreak : winStreak;
+
+    localStorage.setItem(
+      "stats",
+      JSON.stringify({
+        winStreak,
+        games: stats.games + 1,
+        wins: stats.wins + (won ? 1 : 0),
+        maxStreak,
+        lastWin: won ? currentGame : stats.lastWin,
+      })
+    );
+  }
+
+  const createdStats = JSON.parse(localStorage.getItem("stats"));
+  gtag("event", "user_stats", {
+    createdStats
+  });
+}
+
+function getStats() {
+  return JSON.parse(localStorage.getItem("stats"));
+}
+
+function changeActiveRow() {
+  const { currentRow } = getState();
+  for (let i = 0; i < global.boxes; i++) {
+    const box = document.getElementById(`box${currentRow}${i}`);
+
+    box.classList.add("active");
+
+    if (i === 0) {
+      box.classList.add("focus");
+    }
+  }
+}
+
+function setGameWin() {
+  const { currentRow } = getState();
+
+  for (let i = 0; i < global.boxes; i += 1) {
+    const box = document.getElementById(`box${currentRow}${i}`);
+    box.style.animationDelay = `0ms`;
+    box.classList.add("win-animated");
+  }
+}
+
+function showAnswer() {
+  const { answer } = getState();
+  const body = document.getElementsByTagName("body")[0];
+  const tag = document.createElement("div");
+  const tagText = document.createElement("h4");
+  tag.id = "tag";
+  tagText.textContent = answer;
+  tag.appendChild(tagText);
+  body.appendChild(tag);
+}
+
+function showAlert(alert) {
+  const body = document.getElementsByTagName("body")[0];
+  const alertTag = document.createElement("div");
+  const alertText = document.createElement("h4");
+  alertTag.id = "alert";
+  alertText.textContent = alert;
+  alertTag.appendChild(alertText);
+  body.appendChild(alertTag);
+}
+
+function cleanRow() {
+  const { grid, currentRow } = getState();
+
+  for (let i = 0; i < global.boxes; i += 1) {
+    grid[currentRow][i] = "";
+    updateState("grid", grid);
+
+    const box = document.getElementById(`box${currentRow}${i}`);
+    box.classList.add("empty-animated");
+
+    setTimeout(() => {
+      box.classList.remove("empty-animated");
+    }, 550);
+  }
+
+  updateCurrentColumn(0);
+}
+
+function validateBook(word) {
+  const books = Object.keys(bible).map((abbrv) => abbrv.toUpperCase());
+  const book = word.slice(0, 2).join("");
+  return books.includes(book);
+}
+
+function removeLetter() {
+  const { grid, currentColumn, currentRow } = getState();
+
+  if (currentColumn > 0) updateCurrentColumn(currentColumn - 1);
+  grid[currentRow][currentColumn - 1] = "";
+  updateState("grid", grid);
+}
+
+function updateBox() {
+  const { grid, currentRow, currentColumn } = getState();
+
+  for (let i = 0; i < global.chances; i += 1) {
+    for (let j = 0; j < global.boxes; j += 1) {
+      const box = document.getElementById(`box${i}${j}`);
+
+      if (i === currentRow && j === currentColumn && j === 1) {
+        box.classList.add("focus");
+      } else {
+        box.classList.remove("focus");
+      }
+
+      const letter = grid[i][j];
+      box.textContent = letter;
+    }
+  }
+}
+
+async function createShareContent() {
+    gtag("event", "share_button_click", {
+      event_category: "Social",
+      event_label: "User clicked the share button",
+    });
+
+  const stats = getStats();
+  const { currentGame, versicle } = getState();
+
+  const shareData = {
+    title: "Biblio",
+    text: "",
+    url: "",
+  };
+
+  let shareText = `Joguei bibliooo.com.br #${currentGame} 🔥${stats.winStreak}\n\n`;
+
+  for (let i = 0; i < global.chances; i += 1) {
+    let linUsed = false;
+    for (let j = 0; j < global.boxes; j += 1) {
+      const box = document.getElementById(`box${i}${j}`);
+
+      if (box && box.textContent) {
+        linUsed = true;
+        const classList = box.classList;
+        let square;
+
+        if (classList.contains("wrong")) {
+          square = "⬛";
+        } else if (classList.contains("right")) {
+          square = "🟩";
+        } else if (classList.contains("parcial")) {
+          square = "🟨";
+        }
+
+        shareText += square;
+      }
+    }
+
+    if (linUsed) shareText += "\n";
+  }
+
+  shareText += `\n"${versicle}"\n`;
+
+  shareData.text = shareText;
+
+  try {
+    if (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    ) {
+      await navigator.share(shareData);
+    } else {
+      navigator.clipboard.writeText(shareText);
+      showAlert("Texto copiado!");
+    }
+  } catch (err) {
+    console.error(`Error: ${err}`);
+  }
+}
+
+function getSequentialNumber() {
+  const dayOne = getDateOne();
+  const currentDate = new Date();
+
+  const dayDifference = Math.floor(
+    (currentDate - dayOne) / (1000 * 60 * 60 * 24)
+  );
+
+  const sequentialNumber = dayDifference + 1;
+
+  return sequentialNumber;
+}
+
 function getRandomVerse() {
-	const actualDate = new Date().toISOString().slice(0, 10);
+  const actualDate = getUserDate().toISOString().slice(0, 10);
   const hash = hashCode(actualDate);
-	
-	const books = Object.keys(bible);
-	const booksIndex = ((hash % books.length) + books.length) % books.length;
-	const book = books[booksIndex];
 
-	const chapters = bible[book];
-	const chapterIndex = (((hash >> 16) % chapters.length) + chapters.length) % chapters.length;
-	const { chapter, versicles } = bible[book][chapterIndex];
+  const books = Object.keys(bible);
+  const booksIndex = ((hash % books.length) + books.length) % books.length;
+  const book = books[booksIndex];
 
-	const verse = (((hash >> 8) % versicles) + versicles) % versicles;
-	
-	return { book, chapter, verse }
-};
+  const chapters = bible[book];
+  const chapterIndex =
+    (((hash >> 16) % chapters.length) + chapters.length) % chapters.length;
+  const { chapter, versicles } = bible[book][chapterIndex];
+
+  const verse = (((hash >> 8) % versicles) + versicles) % versicles;
+
+  return { book, chapter, verse };
+}
+
+function setSecret(book, chapter, verse) {
+  let answer = "";
+
+  answer += book.slice(0, 2).toUpperCase();
+  answer += chapter.toString().length === 2 ? chapter : "0" + chapter;
+  answer += verse.toString().length === 2 ? verse : "0" + verse;
+
+  updateState("secret", answer.split(""));
+}
+
+function showStatsModal() {
+  const stats = getStats();
+  const state = getState();
+  const percentage = (stats.wins * 100) / stats.games;
+
+  const modal = document.getElementById("modal");
+  const modalHeader = document.getElementsByClassName("modal-title")[0];
+  const statDiv = document.querySelectorAll(".stat");
+  const button = document.getElementById("share-button");
+
+  const text = state.won ? "Parabéns!" : "Que pena!";
+  modalHeader.innerHTML = `${text}<br/><span>Volte amanhã para um novo versículo.</span>`;
+
+  const statsToShow = [
+    { stat: stats.games, title: "Jogos" },
+    {
+      stat: `${percentage.toFixed(1).replace(".0", "")}%`,
+      title: "Porcentagem de vitórias",
+    },
+    { stat: stats.winStreak, title: "Sequencia de vitórias" },
+    { stat: stats.maxStreak, title: "Sequencia máxima" },
+  ];
+
+  for (let i = 0; i < statDiv.length; i += 1) {
+    statDiv[i].childNodes[1].textContent = statsToShow[i].stat;
+    statDiv[i].childNodes[3].textContent = statsToShow[i].title;
+  }
+
+  button.onclick = () => createShareContent();
+
+  modal.classList.remove("hidden");
+}
+
+function showHelpModal() {
+  const modal = document.getElementById("help-modal");
+  modal.classList.remove("hidden");
+}
+
+function hideHelpModal() {
+  const modal = document.getElementById("help-modal");
+  modal.classList.add("hidden");
+}
+
+function getUserDate() {
+  const currentDate = new Date();
+  const timezoneOffset = currentDate.getTimezoneOffset();
+  const offsetMilliseconds = timezoneOffset * 60 * 1000;
+  return new Date(currentDate.getTime() - offsetMilliseconds);
+}
+
+function getDateOne() {
+  const currentDate = new Date("2024-04-26");
+  currentDate.setUTCHours(0, 0, 0, 0);
+  return currentDate;
+}
 
 function hashCode(str) {
   let hash = 0;
@@ -1547,121 +1988,4 @@ function hashCode(str) {
   return hash;
 }
 
-function getAnswer(book, chapter, verse) {
-	let answer = "";
-	answer += book.slice(0, 2).toUpperCase();
-	answer += chapter.toString().length === 2 ? chapter : "0" + chapter;
-	answer += verse.toString().length === 2 ? verse : "0" + verse;
-	return answer;
-}
-
-const buttons = document.querySelectorAll("button")
-
-buttons.forEach((button) => {
-	button.addEventListener("click", () => {
-		const isNumber = /^\d$/;
-
-		if (button.id === "kbd_enter") {
-			const event = new KeyboardEvent("keyup", { key: "Enter" });
-			document.body.dispatchEvent(event);
-		} else if (button.id === "kbd_backspace") { 
-			const event = new KeyboardEvent("keyup", { key: "Backspace"});
-			document.body.dispatchEvent(event);	
-		} else if (isNumber.test(button.textContent)) { 
-			const event = new KeyboardEvent("keyup", { key: button.textContent, code: `Digit${button.textContent}` });
-			document.body.dispatchEvent(event);	
-		} else {
-			const event = new KeyboardEvent("keyup", { key: button.textContent, code: `Key${button.textContent}` });
-			document.body.dispatchEvent(event);
-		}
-	})
-})
-
-function setItemUntilNextDay(key, value) {
-  let tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  let timeUntilMidnight = tomorrow.getTime() - Date.now();
-
-  localStorage.setItem(
-    key,
-    JSON.stringify({
-      value: value,
-      expirationTime: Date.now() + timeUntilMidnight,
-    })
-  );
-}
-
-function setTry(value, won) {
-	const game = JSON.parse(localStorage.getItem("game"));
-	
-	const tries = game.tries;
-
-	localStorage.setItem("game", JSON.stringify({
-		...game,
-		tries: [...tries, value],
-		won: won || null,
-	}))
-}
-
-function setGame(answer, versicle) {
-	localStorage.setItem("game", JSON.stringify({
-		answer,
-		versicle,
-		tries: [],
-		currentStreak: 0,
-		greatestStreak: 0,
-		won: null,
-	}));
-}
-
-function updateGame(game, answer, versicle, won) {
-	localStorage.setItem("game", JSON.stringify({
-		...game,
-		answer,
-		versicle,
-	}));
-}
-
-
-
-function restartGame(game, answer, versicle) {
-  localStorage.setItem(
-    "game",
-    JSON.stringify({
-      ...game,
-      answer,
-			versicle,
-			tries: []
-    })
-  );
-}
-
-function getGame() {
-	return JSON.parse(localStorage.getItem("game")) || null;
-}
-
-function getItemUntilNextDay(key) {
-  let item = localStorage.getItem(key);
-  if (item) {
-		data = JSON.parse(item);
-		
-    if (Date.now() >= data.expirationTime) {
-      localStorage.removeItem(key);
-      return null;
-    } else {
-      return data.value;
-    }
-  }
-  return null; // Item not found or expired
-}
-
-function stopLoading() {
-	const loading = document.getElementById("loading");
-	const main = document.querySelector("main");
-	const keyboard = document.getElementById("keyboard");
-
-	loading.setAttribute("style", "display: none");
-	main.setAttribute("style", "display: flex");
-	keyboard.setAttribute("style", "display: flex");
-}
+startUp();
