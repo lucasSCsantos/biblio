@@ -224,6 +224,7 @@ html, body {
 	outline: none;
 	border: none;
 	cursor: pointer;
+	color: black;
 }
 
 .modal-footer button:active {
