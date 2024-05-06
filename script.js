@@ -1340,6 +1340,8 @@ async function startUp() {
     if (state.gameOver) showAnswer();
     showStatsModal();
   }
+
+  hideStatsModal();
 }
 
 function updateState(key, value) {
@@ -1955,10 +1957,12 @@ function showStatsModal() {
   modal.classList.remove("hidden");
 }
 
-function hideStatsModal() {
-  const modal = document.getElementById("modal");
-
-  modal.classList.add("hidden");
+function hideStatsModal(e) {
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "modal") {
+      modal.classList.add("hidden");
+    }
+  })
 }
 
 function showHelpModal() {
