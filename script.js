@@ -1955,6 +1955,12 @@ function showStatsModal() {
   modal.classList.remove("hidden");
 }
 
+function hideStatsModal() {
+  const modal = document.getElementById("modal");
+
+  modal.classList.add("hidden");
+}
+
 function showHelpModal() {
   const modal = document.getElementById("help-modal");
   modal.classList.remove("hidden");
