@@ -1665,6 +1665,7 @@ function revealWord(guess) {
     setTimeout(() => {
       setGameWin();
       updateState("won", true);
+      updateState("gameOver", false);
       updateStats();
     }, finishDelay);
     setTimeout(() => {
@@ -1672,6 +1673,7 @@ function revealWord(guess) {
     }, finishDelay + 1000);
   } else if (gameOver) {
     updateState("gameOver", true);
+    updateState("won", false);
     updateStats();
     showStatsModal();
     showAnswer();
