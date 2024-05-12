@@ -1665,7 +1665,6 @@ function revealWord(guess) {
     setTimeout(() => {
       setGameWin();
       updateState("won", true);
-      updateState("gameOver", false);
       updateStats();
     }, finishDelay);
     setTimeout(() => {
@@ -1673,7 +1672,6 @@ function revealWord(guess) {
     }, finishDelay + 1000);
   } else if (gameOver) {
     updateState("gameOver", true);
-    updateState("won", false);
     updateStats();
     showStatsModal();
     showAnswer();
@@ -1703,9 +1701,12 @@ function updateStats() {
       })
     );
   } else {
-    const winStreak = gameOver ? 0 : stats.winStreak + ((won && stats.lastWin + 1 === currentGame) ? 1 : 0);
+    const winStreak = gameOver
+      ? 0
+      : won && stats.lastWin + 1 === currentGame
+      ? stats.winStreak + 1
+      : 1;
     const maxStreak = stats.maxStreak > winStreak ? stats.maxStreak : winStreak;
-
     localStorage.setItem(
       "stats",
       JSON.stringify({
