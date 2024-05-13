@@ -1483,7 +1483,6 @@ function drawGrid(container, chances, boxes) {
 
   grid.className = "grid";
 
-  console.log(window.innerWidth / 4)  
   const adwidth = window.innerWidth > 420 ? '20%' :  window.innerWidth < 380 ? '0' : '8%';
 
   grid.innerHTML = `
