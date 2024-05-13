@@ -10,7 +10,7 @@ Biblio é um desafio diário para desafiar o seu conhecimento bíblico! Similar 
 
 ---
 
-## O Que Tem Dentro:
+## Conteúdo:
 
 - **Desafio Diário:** Comece o seu dia com um novo versículo esperando para ser descoberto.
 - **Adivinhe com Sabedoria:** Você tem tentativas limitadas, então faça cada palpite valer a pena!
