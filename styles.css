@@ -317,6 +317,18 @@ body {
 	grid-template-columns: repeat(7, auto);
 }
 
+.adsbygoogle {
+	position: absolute;
+	left: 0;
+	/* width: 100px; */
+	height: calc(4.2rem * 6);
+}
+
+.ads-right {
+	left: auto;
+	right: 0 !important;
+}
+
 .box {
 	width: 4.2rem;
 	height: 4.2rem;
@@ -388,6 +400,10 @@ body {
 		width: 80%;
 	}
 
+	.adsbygoogle {
+		height: calc(2.8rem * 6);
+	}
+
 	.box {
 		width: 2.8rem;
 		height: 2.8rem;
@@ -449,6 +465,10 @@ body {
 
 	header h1 {
 		font-size: 22px;
+	}
+
+	.adsbygoogle {
+		height: calc(2.6rem * 6);
 	}
 		
 	.box {

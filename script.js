@@ -1483,6 +1483,26 @@ function drawGrid(container, chances, boxes) {
 
   grid.className = "grid";
 
+  console.log(window.innerWidth / 4)  
+  const adwidth = window.innerWidth > 420 ? '20%' :  window.innerWidth < 380 ? '0' : '8%';
+
+  grid.innerHTML = `
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
+        crossorigin="anonymous"></script>
+    <!-- Laterais -->
+    <ins class="adsbygoogle"
+        style="display:block;width:${adwidth}"
+        data-ad-client="ca-pub-4020170826821314"
+        data-ad-slot="4970214821"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  `;
+
+  // grid.appendChild(ad);
+
   for (let i = 0; i < chances; i++) {
     for (let j = 0; j < boxes; j++) {
       const box = drawBox(i, j);
@@ -1499,6 +1519,21 @@ function drawGrid(container, chances, boxes) {
       grid.appendChild(box);
     }
   }
+
+  grid.innerHTML += `
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
+        crossorigin="anonymous"></script>
+    <!-- Laterais -->
+    <ins class="adsbygoogle ads-right"
+        style="display:block;width:${adwidth};"
+        data-ad-client="ca-pub-4020170826821314"
+        data-ad-slot="4970214821"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  `;
 
   container.appendChild(grid);
 }
