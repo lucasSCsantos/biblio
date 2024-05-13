@@ -33,7 +33,7 @@ Pronto para começar? Veja como:
 
 Tem uma ideia para tornar o Biblio ainda mais legal? Estou de ouvidos abertos! Veja como você pode ajudar:
 
-1. **Junte-se à Festa:** Faça um fork do repositório e comece a mexer.
+1. **Junte-se ao Trabalho:** Faça um fork do repositório e comece a mexer.
 2. **Mostre seu Talento:** Compartilhe suas incríveis alterações com um Pull Request.
 3. **Suportando em Amor:** Vou orar por sua vida em agradecimento a sua contribuição.
 
