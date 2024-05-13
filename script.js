@@ -1991,7 +1991,14 @@ function showStatsModal() {
 
   button.onclick = () => createShareContent();
 
+  disableEnter();
+
   modal.classList.remove("hidden");
+}
+
+function disableEnter() {
+  const enter = document.getElementById("Enter");
+  enter.setAttribute("disabled", "true")
 }
 
 function hideStatsModal(e) {
