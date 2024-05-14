@@ -474,50 +474,50 @@ const bible = {
     { chapter: 9, versicles: 32 },
     { chapter: 10, versicles: 3 },
   ],
-  "jó": [
-    { chapter: 1, versicles: 22 },
-    { chapter: 2, versicles: 13 },
-    { chapter: 3, versicles: 26 },
-    { chapter: 4, versicles: 21 },
-    { chapter: 5, versicles: 27 },
-    { chapter: 6, versicles: 30 },
-    { chapter: 7, versicles: 21 },
-    { chapter: 8, versicles: 22 },
-    { chapter: 9, versicles: 35 },
-    { chapter: 10, versicles: 22 },
-    { chapter: 11, versicles: 20 },
-    { chapter: 12, versicles: 25 },
-    { chapter: 13, versicles: 28 },
-    { chapter: 14, versicles: 22 },
-    { chapter: 15, versicles: 35 },
-    { chapter: 16, versicles: 22 },
-    { chapter: 17, versicles: 16 },
-    { chapter: 18, versicles: 21 },
-    { chapter: 19, versicles: 29 },
-    { chapter: 20, versicles: 29 },
-    { chapter: 21, versicles: 34 },
-    { chapter: 22, versicles: 30 },
-    { chapter: 23, versicles: 17 },
-    { chapter: 24, versicles: 25 },
-    { chapter: 25, versicles: 6 },
-    { chapter: 26, versicles: 14 },
-    { chapter: 27, versicles: 23 },
-    { chapter: 28, versicles: 28 },
-    { chapter: 29, versicles: 25 },
-    { chapter: 30, versicles: 31 },
-    { chapter: 31, versicles: 40 },
-    { chapter: 32, versicles: 22 },
-    { chapter: 33, versicles: 33 },
-    { chapter: 34, versicles: 37 },
-    { chapter: 35, versicles: 16 },
-    { chapter: 36, versicles: 33 },
-    { chapter: 37, versicles: 24 },
-    { chapter: 38, versicles: 41 },
-    { chapter: 39, versicles: 30 },
-    { chapter: 40, versicles: 24 },
-    { chapter: 41, versicles: 34 },
-    { chapter: 42, versicles: 17 },
-  ],
+  // "jó": [
+  //   { chapter: 1, versicles: 22 },
+  //   { chapter: 2, versicles: 13 },
+  //   { chapter: 3, versicles: 26 },
+  //   { chapter: 4, versicles: 21 },
+  //   { chapter: 5, versicles: 27 },
+  //   { chapter: 6, versicles: 30 },
+  //   { chapter: 7, versicles: 21 },
+  //   { chapter: 8, versicles: 22 },
+  //   { chapter: 9, versicles: 35 },
+  //   { chapter: 10, versicles: 22 },
+  //   { chapter: 11, versicles: 20 },
+  //   { chapter: 12, versicles: 25 },
+  //   { chapter: 13, versicles: 28 },
+  //   { chapter: 14, versicles: 22 },
+  //   { chapter: 15, versicles: 35 },
+  //   { chapter: 16, versicles: 22 },
+  //   { chapter: 17, versicles: 16 },
+  //   { chapter: 18, versicles: 21 },
+  //   { chapter: 19, versicles: 29 },
+  //   { chapter: 20, versicles: 29 },
+  //   { chapter: 21, versicles: 34 },
+  //   { chapter: 22, versicles: 30 },
+  //   { chapter: 23, versicles: 17 },
+  //   { chapter: 24, versicles: 25 },
+  //   { chapter: 25, versicles: 6 },
+  //   { chapter: 26, versicles: 14 },
+  //   { chapter: 27, versicles: 23 },
+  //   { chapter: 28, versicles: 28 },
+  //   { chapter: 29, versicles: 25 },
+  //   { chapter: 30, versicles: 31 },
+  //   { chapter: 31, versicles: 40 },
+  //   { chapter: 32, versicles: 22 },
+  //   { chapter: 33, versicles: 33 },
+  //   { chapter: 34, versicles: 37 },
+  //   { chapter: 35, versicles: 16 },
+  //   { chapter: 36, versicles: 33 },
+  //   { chapter: 37, versicles: 24 },
+  //   { chapter: 38, versicles: 41 },
+  //   { chapter: 39, versicles: 30 },
+  //   { chapter: 40, versicles: 24 },
+  //   { chapter: 41, versicles: 34 },
+  //   { chapter: 42, versicles: 17 },
+  // ],
   sl: [
     { chapter: 1, versicles: 6 },
     { chapter: 2, versicles: 12 },
@@ -1578,6 +1578,9 @@ function drawBox(row, column) {
     box.classList.add("active");
   }
 
+  box.ariaLive = "polite"
+  box.role = "text"
+
   return box;
 }
 
@@ -1749,7 +1752,7 @@ function updateStats() {
     const winStreak = gameOver
       ? 0
       : won && stats.lastWin + 1 === currentGame
-      ? stats.winStreak + 1
+      ? (stats.winStreak === 0 ? 1 : stats.winStreak) + 1
       : 1;
     const maxStreak = stats.maxStreak > winStreak ? stats.maxStreak : winStreak;
     localStorage.setItem(
@@ -1986,13 +1989,13 @@ function showStatsModal() {
   modalHeader.innerHTML = `${text}<br/><span>Volte amanhã para um novo versículo.</span>`;
 
   const statsToShow = [
-    { stat: stats.games, title: "Jogos" },
+    { stat: stats.games, title: "Total de jogos" },
     {
       stat: `${percentage.toFixed(1).replace(".0", "")}%`,
       title: "Porcentagem de vitórias",
     },
-    { stat: stats.winStreak, title: "Sequencia de vitórias" },
-    { stat: stats.maxStreak, title: "Sequencia máxima" },
+    { stat: stats.winStreak, title: "Sequência atual" },
+    { stat: stats.maxStreak, title: "Sequência máxima" },
   ];
 
   for (let i = 0; i < statDiv.length; i += 1) {
