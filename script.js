@@ -1768,9 +1768,7 @@ function updateStats() {
   }
 
   const createdStats = JSON.parse(localStorage.getItem("stats"));
-  gtag("event", "user_stats", {
-    createdStats,
-  });
+  gtag("event", "user_stats", createdStats);
 }
 
 function getStats() {
