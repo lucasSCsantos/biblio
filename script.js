@@ -474,50 +474,50 @@ const bible = {
     { chapter: 9, versicles: 32 },
     { chapter: 10, versicles: 3 },
   ],
-  // job: [
-  //   { chapter: 1, versicles: 22 },
-  //   { chapter: 2, versicles: 13 },
-  //   { chapter: 3, versicles: 26 },
-  //   { chapter: 4, versicles: 21 },
-  //   { chapter: 5, versicles: 27 },
-  //   { chapter: 6, versicles: 30 },
-  //   { chapter: 7, versicles: 21 },
-  //   { chapter: 8, versicles: 22 },
-  //   { chapter: 9, versicles: 35 },
-  //   { chapter: 10, versicles: 22 },
-  //   { chapter: 11, versicles: 20 },
-  //   { chapter: 12, versicles: 25 },
-  //   { chapter: 13, versicles: 28 },
-  //   { chapter: 14, versicles: 22 },
-  //   { chapter: 15, versicles: 35 },
-  //   { chapter: 16, versicles: 22 },
-  //   { chapter: 17, versicles: 16 },
-  //   { chapter: 18, versicles: 21 },
-  //   { chapter: 19, versicles: 29 },
-  //   { chapter: 20, versicles: 29 },
-  //   { chapter: 21, versicles: 34 },
-  //   { chapter: 22, versicles: 30 },
-  //   { chapter: 23, versicles: 17 },
-  //   { chapter: 24, versicles: 25 },
-  //   { chapter: 25, versicles: 6 },
-  //   { chapter: 26, versicles: 14 },
-  //   { chapter: 27, versicles: 23 },
-  //   { chapter: 28, versicles: 28 },
-  //   { chapter: 29, versicles: 25 },
-  //   { chapter: 30, versicles: 31 },
-  //   { chapter: 31, versicles: 40 },
-  //   { chapter: 32, versicles: 22 },
-  //   { chapter: 33, versicles: 33 },
-  //   { chapter: 34, versicles: 37 },
-  //   { chapter: 35, versicles: 16 },
-  //   { chapter: 36, versicles: 33 },
-  //   { chapter: 37, versicles: 24 },
-  //   { chapter: 38, versicles: 41 },
-  //   { chapter: 39, versicles: 30 },
-  //   { chapter: 40, versicles: 24 },
-  //   { chapter: 41, versicles: 34 },
-  //   { chapter: 42, versicles: 17 },
-  // ],
+  "jó": [
+    { chapter: 1, versicles: 22 },
+    { chapter: 2, versicles: 13 },
+    { chapter: 3, versicles: 26 },
+    { chapter: 4, versicles: 21 },
+    { chapter: 5, versicles: 27 },
+    { chapter: 6, versicles: 30 },
+    { chapter: 7, versicles: 21 },
+    { chapter: 8, versicles: 22 },
+    { chapter: 9, versicles: 35 },
+    { chapter: 10, versicles: 22 },
+    { chapter: 11, versicles: 20 },
+    { chapter: 12, versicles: 25 },
+    { chapter: 13, versicles: 28 },
+    { chapter: 14, versicles: 22 },
+    { chapter: 15, versicles: 35 },
+    { chapter: 16, versicles: 22 },
+    { chapter: 17, versicles: 16 },
+    { chapter: 18, versicles: 21 },
+    { chapter: 19, versicles: 29 },
+    { chapter: 20, versicles: 29 },
+    { chapter: 21, versicles: 34 },
+    { chapter: 22, versicles: 30 },
+    { chapter: 23, versicles: 17 },
+    { chapter: 24, versicles: 25 },
+    { chapter: 25, versicles: 6 },
+    { chapter: 26, versicles: 14 },
+    { chapter: 27, versicles: 23 },
+    { chapter: 28, versicles: 28 },
+    { chapter: 29, versicles: 25 },
+    { chapter: 30, versicles: 31 },
+    { chapter: 31, versicles: 40 },
+    { chapter: 32, versicles: 22 },
+    { chapter: 33, versicles: 33 },
+    { chapter: 34, versicles: 37 },
+    { chapter: 35, versicles: 16 },
+    { chapter: 36, versicles: 33 },
+    { chapter: 37, versicles: 24 },
+    { chapter: 38, versicles: 41 },
+    { chapter: 39, versicles: 30 },
+    { chapter: 40, versicles: 24 },
+    { chapter: 41, versicles: 34 },
+    { chapter: 42, versicles: 17 },
+  ],
   sl: [
     { chapter: 1, versicles: 6 },
     { chapter: 2, versicles: 12 },
@@ -1411,8 +1411,18 @@ function getState() {
   return JSON.parse(localStorage.getItem("state"));
 }
 
+function bookException(book) {
+  if (book === "jó") {
+    return 'job'
+  }
+
+  return book;
+}
+
 async function drawVersicle(container, book, chapter, verse) {
   let { versicle: verseText } = getState();
+
+  book = bookException(book);
 
   if (!verseText) {
     const data = await fetch(
@@ -1483,7 +1493,8 @@ function drawGrid(container, chances, boxes) {
 
   grid.className = "grid";
 
-  const adwidth = window.innerWidth > 420 ? '20%' :  window.innerWidth < 380 ? '0' : '8%';
+  const adwidth =
+    window.innerWidth > 420 ? "20%" : window.innerWidth < 380 ? "0" : "8%";
 
   grid.innerHTML = `
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
@@ -1755,7 +1766,7 @@ function updateStats() {
 
   const createdStats = JSON.parse(localStorage.getItem("stats"));
   gtag("event", "user_stats", {
-    createdStats
+    createdStats,
   });
 }
 
@@ -1826,7 +1837,7 @@ function cleanRow() {
 }
 
 function validateBook(word) {
-  const books = Object.keys(bible).map((abbrv) => abbrv.toUpperCase());
+  const books = Object.keys(bible).map((abbrv) => abbrv.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
   const book = word.slice(0, 2).join("");
   return books.includes(book);
 }
@@ -1859,10 +1870,10 @@ function updateBox() {
 }
 
 async function createShareContent() {
-    gtag("event", "share_button_click", {
-      event_category: "Social",
-      event_label: "User clicked the share button",
-    });
+  gtag("event", "share_button_click", {
+    event_category: "Social",
+    event_label: "User clicked the share button",
+  });
 
   const stats = getStats();
   const { currentGame, versicle } = getState();
@@ -1954,7 +1965,7 @@ function getRandomVerse() {
 function setSecret(book, chapter, verse) {
   let answer = "";
 
-  answer += book.slice(0, 2).toUpperCase();
+  answer += book.slice(0, 2).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');;
   answer += chapter.toString().length === 2 ? chapter : "0" + chapter;
   answer += verse.toString().length === 2 ? verse : "0" + verse;
 
@@ -1998,7 +2009,7 @@ function showStatsModal() {
 
 function disableEnter() {
   const enter = document.getElementById("Enter");
-  enter.setAttribute("disabled", "true")
+  enter.setAttribute("disabled", "true");
 }
 
 function hideStatsModal(e) {
@@ -2006,7 +2017,7 @@ function hideStatsModal(e) {
     if (e.target.id === "modal") {
       modal.classList.add("hidden");
     }
-  })
+  });
 }
 
 function showHelpModal() {
