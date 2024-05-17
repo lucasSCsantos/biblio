@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="styles.css">
 	<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 	<link rel="canonical" href="https://bibliooo.com.br/">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
 		crossorigin="anonymous"></script>
 </head>
@@ -90,6 +91,42 @@
 			</div>
 		</div>
 	</div>
+	<!-- <div id="settings-modal" class="hidden">
+		<div class="settings-modal-container">
+		</div>
+	</div> -->
+	<div id="info-modal" class="hidden" onclick="hideInfoModal()">
+		<div class="info-modal-container">
+			<h3 id="info-container-title">Sobre o Biblio</h3>
+			<p>
+				O biblio foi criado como uma alternativa ao <a href="https://www.nytimes.com/games/wordle/index.html" target="_blank">Wordle</a>.
+			</p>
+			<p>
+				Todo dia uma nova chance de testar seu conhecimento bíblico e também descobrir mais sobre as escrituras.
+			</p>
+			<p>
+				Os versículos vem da api <a
+					href="https://www.abibliadigital.com.br/" target="_blank">ABibliaDigital</a>.
+			</p>
+
+			<p>
+				Inspirado por <a href="https://term.ooo" target="_blank">Termo</a>.
+			</p>
+			<br/>
+			<h3 id="info-container-title">Termo de Privacidade</h3>
+			<p>
+				Este jogo não coleta dados pessoais diretamente. Utilizamos o Google Analytics para entender como os usuários
+				interagem com o jogo. Essas informações são anônimas e agregadas.
+			</p>
+			<p>
+				Não utilizamos cookies, só registramos localmente as suas estatísticas de forma anônima.
+			</p>
+			<p>
+				Para mais informações sobre como o Google Analytics coleta e processa dados, consulte a <a
+					href="https://policies.google.com/privacy" target="_blank">Política de Privacidade do Google</a>.
+			</p>
+		</div>
+	</div>
 	<div id="modal" class="hidden">
 		<div class="modal-container">
 			<div class="modal-header">
@@ -124,9 +161,20 @@
 	</div>
 	<header>
 			<h1>BIBLIO</h1>
-			<button id="help" onclick="showHelpModal()">
-				Como jogar
-			</button>
+			<div id="icons">
+				<button id="help" onclick="showHelpModal()">
+					<i class="fa-solid fa-circle-question"></i>
+				</button>
+				<button id="stats" onclick="showStatsModal()">
+					<i class="fa-solid fa-square-poll-horizontal"></i>
+				</button>
+				<!-- <button id="settings" onclick="showSettingsModal()">
+					<i class="fa-solid fa-gear"></i>
+				</button> -->
+				<button id="info" onclick="showInfoModal()">
+					<i class="fa-solid fa-circle-info"></i>
+				</button>
+			</div>
 	</header>
 	<main id="game">
 	</main>

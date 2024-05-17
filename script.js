@@ -1342,6 +1342,7 @@ async function startUp() {
   }
 
   hideStatsModal();
+  hideSettingsModal();
 }
 
 function updateState(key, value) {
@@ -1493,23 +1494,23 @@ function drawGrid(container, chances, boxes) {
 
   grid.className = "grid";
 
-  const adwidth =
-    window.innerWidth > 420 ? "20%" : window.innerWidth < 380 ? "0" : "8%";
+  // const adwidth =
+  //   window.innerWidth > 420 ? "20%" : window.innerWidth < 380 ? "0" : "8%";
 
-  grid.innerHTML = `
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
-        crossorigin="anonymous"></script>
-    <!-- Laterais -->
-    <ins class="adsbygoogle"
-        style="display:block;width:${adwidth}"
-        data-ad-client="ca-pub-4020170826821314"
-        data-ad-slot="4970214821"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  `;
+  // grid.innerHTML = `
+  //   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
+  //       crossorigin="anonymous"></script>
+  //   <!-- Laterais -->
+  //   <ins class="adsbygoogle"
+  //       style="display:block;width:${adwidth}"
+  //       data-ad-client="ca-pub-4020170826821314"
+  //       data-ad-slot="4970214821"
+  //       data-ad-format="auto"
+  //       data-full-width-responsive="true"></ins>
+  //   <script>
+  //       (adsbygoogle = window.adsbygoogle || []).push({});
+  //   </script>
+  // `;
 
   // grid.appendChild(ad);
 
@@ -1530,20 +1531,20 @@ function drawGrid(container, chances, boxes) {
     }
   }
 
-  grid.innerHTML += `
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
-        crossorigin="anonymous"></script>
-    <!-- Laterais -->
-    <ins class="adsbygoogle ads-right"
-        style="display:block;width:${adwidth};"
-        data-ad-client="ca-pub-4020170826821314"
-        data-ad-slot="4970214821"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  `;
+  // grid.innerHTML += `
+  //   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
+  //       crossorigin="anonymous"></script>
+  //   <!-- Laterais -->
+  //   <ins class="adsbygoogle ads-right"
+  //       style="display:block;width:${adwidth};"
+  //       data-ad-client="ca-pub-4020170826821314"
+  //       data-ad-slot="4970214821"
+  //       data-ad-format="auto"
+  //       data-full-width-responsive="true"></ins>
+  //   <script>
+  //       (adsbygoogle = window.adsbygoogle || []).push({});
+  //   </script>
+  // `;
 
   container.appendChild(grid);
 }
@@ -1983,8 +1984,10 @@ function showStatsModal() {
   const statDiv = document.querySelectorAll(".stat");
   const button = document.getElementById("share-button");
 
-  const text = state.won ? "Parabéns!" : "Que pena!";
-  modalHeader.innerHTML = `${text}<br/><span>Volte amanhã para um novo versículo.</span>`;
+  const played = state.won || state.gameOver;
+
+  const text = state.won ? "Parabéns!" : played ? "Que pena!": "";
+  modalHeader.innerHTML = `${played ? text + "<br/>" : ""}<span>${played ? "Volte amanhã para um novo versículo." : "Todo dia um novo versículo!"}</span>`;
 
   const statsToShow = [
     { stat: stats.games, title: "Total de jogos" },
@@ -2003,6 +2006,12 @@ function showStatsModal() {
 
   button.onclick = () => createShareContent();
 
+  if (!played) {
+    button.classList.add("hidden");
+  } else {
+      button.classList.remove("hidden");
+  }
+
   disableEnter();
 
   modal.classList.remove("hidden");
@@ -2014,9 +2023,21 @@ function disableEnter() {
 }
 
 function hideStatsModal(e) {
+  const modal = document.getElementById("modal");
+
   document.addEventListener("click", (e) => {
     if (e.target.id === "modal") {
       modal.classList.add("hidden");
+    }
+  });
+}
+
+function hideSettingsModal() {
+  const settingsModal = document.getElementById("settings-modal");
+
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "settings-modal") {
+      settingsModal.classList.add("hidden");
     }
   });
 }
@@ -2028,6 +2049,21 @@ function showHelpModal() {
 
 function hideHelpModal() {
   const modal = document.getElementById("help-modal");
+  modal.classList.add("hidden");
+}
+
+function showSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  modal.classList.remove("hidden");
+}
+
+function showInfoModal() {
+  const modal = document.getElementById("info-modal");
+  modal.classList.remove("hidden");
+}
+
+function hideInfoModal() {
+  const modal = document.getElementById("info-modal");
   modal.classList.add("hidden");
 }
 
