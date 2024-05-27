@@ -1327,9 +1327,9 @@ async function startUp() {
   setSecret(book, chapter, verse);
 
   await drawVersicle(main, book, chapter, verse);
-
+  
   drawGrid(main, global.chances, global.boxes);
-
+  
   fixRowError();
 
   drawKeyboard(main);
@@ -1353,9 +1353,10 @@ function fixRowError() {
   const { grid, won, gameOver } = getState();
 
   const index = grid.findIndex((row) => row.reduce((acc, curr) => acc + curr, "") === "");
-  console.log(index)
+
   if (!won && !gameOver) {
     updateCurrentRow(index);
+    updateCurrentColumn(0);
   }
 }
 
