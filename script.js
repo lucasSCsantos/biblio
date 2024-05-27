@@ -1959,9 +1959,9 @@ function getRandomVerse() {
     (((hash >> 16) % chapters.length) + chapters.length) % chapters.length;
   const { chapter, versicles } = bible[book][chapterIndex];
 
-  const verse = (((hash >> 8) % versicles) + versicles) % versicles;
+  const verse = ((((hash >> 8) % versicles) + versicles) % versicles);
 
-  return { book, chapter, verse };
+  return { book, chapter: chapter || 1, verse: verse || 1 };
 }
 
 function setSecret(book, chapter, verse) {
