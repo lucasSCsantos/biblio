@@ -1330,9 +1330,13 @@ async function startUp() {
 
   drawGrid(main, global.chances, global.boxes);
 
+  fixRowError();
+
   drawKeyboard(main);
 
   keyboardEvent();
+
+  updateKeyboard();
 
   const state = getState();
 
@@ -1343,6 +1347,16 @@ async function startUp() {
 
   hideStatsModal();
   hideSettingsModal();
+}
+
+function fixRowError() {
+  const { grid, won, gameOver } = getState();
+
+  const index = grid.findIndex((row) => row.reduce((acc, curr) => acc + curr, "") === "");
+  console.log(index)
+  if (!won && !gameOver) {
+    updateCurrentRow(index);
+  }
 }
 
 function updateState(key, value) {
