@@ -1427,7 +1427,7 @@ async function drawVersicle(container, book, chapter, verse) {
 
   console.log(verseText);
 
-  if (!verseText) {
+  if (!verseText || verseText === "") {
     const data = await fetch(
       `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`
     );
