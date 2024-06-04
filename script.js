@@ -1440,32 +1440,39 @@ async function drawVersicle(container, book, chapter, verse) {
 
   book = bookException(book);
 
-  if (!verseText || verseText === "") {
-    const data = await fetch(
-      `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`
-    );
-
-    const versicle = await data.json();
-    verseText = versicle.text;
-
-    updateState("answer", getAnswer(versicle));
-
-    updateState("versicle", versicle.text);
+  try {
+    if (!verseText || verseText === "") {
+      const data = await fetch(
+        `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`
+      );
+  
+      const versicle = await data.json();
+      verseText = versicle.text;
+  
+      updateState("answer", getAnswer(versicle));
+  
+      updateState("versicle", versicle.text);
+    }
+  
+    const versicleText = document.createElement("h2");
+    versicleText.textContent = `"${verseText}"`;
+  
+    const versicleContainer = document.createElement("div");
+    versicleContainer.className = "versicle";
+  
+    versicleContainer.appendChild(versicleText);
+  
+    container.appendChild(versicleContainer);
+  } catch (error) {
+    console.error(error)
   }
 
-  const versicleText = document.createElement("h2");
-  versicleText.textContent = `"${verseText}"`;
-
-  const versicleContainer = document.createElement("div");
-  versicleContainer.className = "versicle";
-
-  versicleContainer.appendChild(versicleText);
-
-  container.appendChild(versicleContainer);
 }
 
 function getAnswer(versicle) {
   let answer = "";
+
+  console.log(versicle)
 
   answer += versicle.book.name + " ";
   answer += versicle.chapter + ":";
