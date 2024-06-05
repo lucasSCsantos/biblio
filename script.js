@@ -1435,23 +1435,45 @@ function bookException(book) {
   return book;
 }
 
+async function readJsonFile(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+  }
+}
+
 async function drawVersicle(container, book, chapter, verse) {
   let { versicle: verseText } = getState();
 
   book = bookException(book);
 
-  try {
     if (!verseText || verseText === "") {
-      const data = await fetch(
-        `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`
-      );
+      // const data = await fetch(
+      //   `https://www.abibliadigital.com.br/api/verses/nvi/${book}/${chapter}/${verse}`,
+      //   {
+      //     headers: {
+      //       Authorization:
+      //         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdHIiOiJGcmkgRmViIDE2IDIwMjQgMTk6MTg6MDkgR01UKzAwMDAuNjVjZmI0NzliNDA4OTUwMDI4ZmZjOTlhIiwiaWF0IjoxNzA4MTExMDg5fQ.aiKnMPNwpIpTOqkLFQ2QN9kHaw4rPhqlNmkoiUAXrqs",
+      //     },
+      //   }
+      // );
   
-      const versicle = await data.json();
-      verseText = versicle.text;
+      const data = await readJsonFile("./bible.json");
+
+      const bookName = data.find(({ abbrev }) => abbrev === book).name;
+      const versicle = data.find(({ abbrev }) => abbrev === book).chapters[chapter - 1][verse - 1];
+
+      verseText = versicle;
   
-      updateState("answer", getAnswer(versicle));
+      updateState("answer", getAnswer(bookName, chapter, verse));
   
-      updateState("versicle", versicle.text);
+      updateState("versicle", versicle);
     }
   
     const versicleText = document.createElement("h2");
@@ -1463,20 +1485,16 @@ async function drawVersicle(container, book, chapter, verse) {
     versicleContainer.appendChild(versicleText);
   
     container.appendChild(versicleContainer);
-  } catch (error) {
-    console.error(error)
-  }
-
 }
 
-function getAnswer(versicle) {
+function getAnswer(book, chapter, versicle) {
   let answer = "";
 
   console.log(versicle)
 
-  answer += versicle.book.name + " ";
-  answer += versicle.chapter + ":";
-  answer += versicle.number;
+  answer += book + " ";
+  answer += chapter + ":";
+  answer += versicle;
 
   return answer;
 }
