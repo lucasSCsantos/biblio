@@ -1322,7 +1322,7 @@ async function startUp() {
 
   setState();
 
-  const { book, chapter, verse } = getRandomVerse();
+  const { book, chapter, verse } = await getRandomVerse();
 
   setSecret(book, chapter, verse);
 
@@ -2017,7 +2017,7 @@ function getSequentialNumber() {
 async function getRandomVerse() {
   const actualDate = getUserDate().toISOString().slice(0, 10);
   const hash = await sha256(actualDate);
-
+  
   const books = Object.keys(bible);
   const booksIndex =
     ((parseInt(hash, 16) % books.length) + books.length) % books.length;
@@ -2031,7 +2031,7 @@ async function getRandomVerse() {
   const { chapter, versicles } = bible[book][chapterIndex];
   const verse =
     (((parseInt(hash, 16) >> 8) % versicles) + versicles) % versicles;
-
+  
   return { book, chapter: chapter || 1, verse: verse || 1 };
 }
 
@@ -2146,7 +2146,7 @@ function hideInfoModal() {
 }
 
 function getUserDate() {
-  const currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+  const currentDate = new Date();
   const timezoneOffset = currentDate.getTimezoneOffset();
   const offsetMilliseconds = timezoneOffset * 60 * 1000;
   return new Date(currentDate.getTime() - offsetMilliseconds);
