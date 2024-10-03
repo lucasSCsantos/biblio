@@ -1490,8 +1490,6 @@ async function drawVersicle(container, book, chapter, verse) {
 function getAnswer(book, chapter, versicle) {
   let answer = "";
 
-  console.log(versicle)
-
   answer += book + " ";
   answer += chapter + ":";
   answer += versicle;
@@ -1986,28 +1984,68 @@ function getSequentialNumber() {
   return sequentialNumber;
 }
 
-function getRandomVerse() {
+// function getRandomVerse() {
+//   const actualDate = getUserDate().toISOString().slice(0, 10);
+//   const hash = hashCode(actualDate);
+  
+//   const books = Object.keys(bible);
+
+//   const booksIndex = ((hash % books.length) + books.length) % books.length;
+
+//   const book = books[booksIndex];
+
+//   const chapters = bible[book];
+//   const chapterIndex =
+//     (((hash >> 16) % chapters.length) + chapters.length) % chapters.length;
+//   const { chapter, versicles } = bible[book][chapterIndex];
+
+//   const verse = ((((hash >> 8) % versicles) + versicles) % versicles);
+
+//   return { book, chapter: chapter || 1, verse: verse || 1 };
+// }
+
+// function hashCode(str) {
+//   let hash = 0;
+//   for (let i = 0; i < str.length; i++) {
+//     const char = str.charCodeAt(i);
+//     hash = (hash << 5) - hash + char;
+//     hash |= 0;
+//   }
+//   return hash;
+// }
+
+async function getRandomVerse() {
   const actualDate = getUserDate().toISOString().slice(0, 10);
-  const hash = hashCode(actualDate);
+  const hash = await sha256(actualDate);
 
   const books = Object.keys(bible);
-  const booksIndex = ((hash % books.length) + books.length) % books.length;
-  const book = books[booksIndex];
+  const booksIndex =
+    ((parseInt(hash, 16) % books.length) + books.length) % books.length;
 
+  const book = books[booksIndex];
   const chapters = bible[book];
   const chapterIndex =
-    (((hash >> 16) % chapters.length) + chapters.length) % chapters.length;
-  const { chapter, versicles } = bible[book][chapterIndex];
+    (((parseInt(hash, 16) >> 16) % chapters.length) + chapters.length) %
+    chapters.length;
 
-  const verse = ((((hash >> 8) % versicles) + versicles) % versicles);
+  const { chapter, versicles } = bible[book][chapterIndex];
+  const verse =
+    (((parseInt(hash, 16) >> 8) % versicles) + versicles) % versicles;
 
   return { book, chapter: chapter || 1, verse: verse || 1 };
+}
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function setSecret(book, chapter, verse) {
   let answer = "";
 
-  answer += book.slice(0, 2).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');;
+  answer += book.slice(0, 2).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   answer += chapter.toString().length === 2 ? chapter : "0" + chapter;
   answer += verse.toString().length === 2 ? verse : "0" + verse;
 
@@ -2108,7 +2146,7 @@ function hideInfoModal() {
 }
 
 function getUserDate() {
-  const currentDate = new Date();
+  const currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
   const timezoneOffset = currentDate.getTimezoneOffset();
   const offsetMilliseconds = timezoneOffset * 60 * 1000;
   return new Date(currentDate.getTime() - offsetMilliseconds);
@@ -2118,16 +2156,6 @@ function getDateOne() {
   const currentDate = new Date("2024-04-26");
   currentDate.setUTCHours(0, 0, 0, 0);
   return currentDate;
-}
-
-function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
-  }
-  return hash;
 }
 
 startUp();
