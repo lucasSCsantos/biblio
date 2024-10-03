@@ -2014,25 +2014,60 @@ function getSequentialNumber() {
 //   return hash;
 // }
 
+// async function getRandomVerse() {
+//   const actualDate = getUserDate().toISOString().slice(0, 10);
+//   const hash = await sha256(actualDate);
+  
+//   const books = Object.keys(bible);
+//   const booksIndex =
+//     ((parseInt(hash, 16) % books.length) + books.length) % books.length;
+
+//   const book = books[booksIndex];
+//   const chapters = bible[book];
+//   const chapterIndex =
+//     (((parseInt(hash, 16) >> 16) % chapters.length) + chapters.length) %
+//     chapters.length;
+
+//   const { chapter, versicles } = bible[book][chapterIndex];
+//   const verse =
+//     (((parseInt(hash, 16) >> 8) % versicles) + versicles) % versicles;
+  
+//   return { book, chapter: chapter || 1, verse: verse || 1 };
+// }
+
+// async function sha256(message) {
+//   const msgBuffer = new TextEncoder().encode(message);
+//   const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+//   const hashArray = Array.from(new Uint8Array(hashBuffer));
+//   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+// }
+
 async function getRandomVerse() {
   const actualDate = getUserDate().toISOString().slice(0, 10);
   const hash = await sha256(actualDate);
-  
+
   const books = Object.keys(bible);
-  const booksIndex =
-    ((parseInt(hash, 16) % books.length) + books.length) % books.length;
+
+  // Convert part of the hash to decide the book index
+  const booksIndex = parseInt(hash.slice(0, 8), 16) % books.length;
 
   const book = books[booksIndex];
   const chapters = bible[book];
-  const chapterIndex =
-    (((parseInt(hash, 16) >> 16) % chapters.length) + chapters.length) %
-    chapters.length;
 
-  const { chapter, versicles } = bible[book][chapterIndex];
-  const verse =
-    (((parseInt(hash, 16) >> 8) % versicles) + versicles) % versicles;
-  
-  return { book, chapter: chapter || 1, verse: verse || 1 };
+  // Convert another part of the hash to decide the chapter index
+  const chapterIndex = parseInt(hash.slice(8, 16), 16) % chapters.length;
+
+  const { chapter, versicles } = chapters[chapterIndex];
+
+  // Convert another part of the hash to decide the verse index
+  const verseIndex = parseInt(hash.slice(16, 24), 16) % versicles;
+
+  // Return the result ensuring chapter and verse have valid values
+  return {
+    book,
+    chapter: chapter || 1,
+    verse: verseIndex + 1, // verses start from 1
+  };
 }
 
 async function sha256(message) {
@@ -2041,6 +2076,7 @@ async function sha256(message) {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
 
 function setSecret(book, chapter, verse) {
   let answer = "";
