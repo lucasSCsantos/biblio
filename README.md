@@ -45,6 +45,10 @@ Estou aqui para ajudar! Mande uma mensagem no GitHub ou um [e-mail](luc.cristova
 
 ---
 
+## Disclaimer
+
+O biblio não utilizar propagandas e não têm nenhum fim lucrativo.
+
 ## Agradecimentos:
 
 Obrigado meu Senhor, Jesus Cristo ❤✟
