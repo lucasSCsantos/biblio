@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Biblio — desafio bíblico diário</title>
-  <meta name="description" content="Descubra a referência do versículo do dia em seis tentativas. Um jogo gratuito de memória, lógica e conhecimento bíblico.">
+  <meta name="description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
   <meta property="og:title" content="Biblio — desafio bíblico diário">
-  <meta property="og:description" content="Descubra a referência do versículo do dia em seis tentativas. Um jogo gratuito de memória, lógica e conhecimento bíblico.">
+  <meta property="og:description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bibliooo.com.br/">
   <meta name="google-adsense-account" content="ca-pub-4020170826821314">
@@ -16,6 +16,7 @@
   <script src="site-config.js" defer></script>
   <script src="site.js" defer></script>
   <script src="bible-index.js" defer></script>
+  <script src="word-game.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -34,6 +35,12 @@
 </section>
   <main id="conteudo" class="home-content"><h1 class="sr-only">Biblio: desafio bíblico diário</h1>
 <section class="game-panel" aria-label="Desafio bíblico diário">
+  <nav class="game-modes" aria-label="Modos de jogo">
+    <a href="index.html" data-game-mode="referencia" aria-current="page"
+      >Referência</a
+    >
+    <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
+  </nav>
   <div class="game-toolbar">
     <span class="daily-label"
       ><span aria-hidden="true">●</span> Desafio do dia</span
@@ -72,12 +79,12 @@
 </aside>
 <section class="intro-section">
   <p class="eyebrow">Um pouco de memória. Um pouco de lógica.</p>
-  <h2>A passagem é a pista.<br />A referência é o desafio.</h2>
+  <h2>A passagem é a pista.<br />Escolha seu desafio.</h2>
   <p>
-    No Biblio, você recebe o texto de um versículo e tenta descobrir onde ele
-    está na Bíblia. Cada tentativa combina a sigla do livro, o capítulo e o
-    número do versículo. As cores mostram quais letras e números já estão no
-    caminho certo.
+    No Biblio, você tem dois jogos por dia. Em Referência, descubra o livro,
+    capítulo e versículo. Em Palavra, a referência já aparece e você completa
+    uma palavra de cinco letras que falta na passagem. São seis tentativas em
+    cada jogo, com cores que ajudam a encontrar a resposta.
   </p>
   <p>
     Você não precisa conhecer todas as referências de memória: compare as
@@ -120,9 +127,10 @@
   <details>
     <summary>Todo mundo recebe o mesmo desafio?</summary>
     <p>
-      Sim, quem está na mesma data local recebe a mesma referência. O desafio
-      muda à meia-noite do seu dispositivo. Pessoas em fusos diferentes podem
-      estar em dias diferentes.
+      Sim, cada modo tem o mesmo desafio para quem está na mesma data local. Os
+      dois modos usam referências diferentes entre si. O desafio muda à
+      meia-noite do seu dispositivo. Pessoas em fusos diferentes podem estar em
+      dias diferentes.
     </p>
   </details>
   <details>

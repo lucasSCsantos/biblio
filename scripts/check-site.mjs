@@ -36,7 +36,8 @@ for (const page of pages) {
     throw new Error(`IDs duplicados em ${page}`);
   for (const [, value] of html.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
     if (/^(https?:|mailto:)/.test(value)) continue;
-    const [target, anchor] = value.split("#");
+    const [address, anchor] = value.split("#");
+    const target = address.split("?")[0];
     const file = target || page;
     if (!fs.existsSync(file))
       throw new Error(`Recurso ausente em ${page}: ${value}`);

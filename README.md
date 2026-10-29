@@ -1,6 +1,8 @@
 # Biblio
 
-Desafio diário de referências bíblicas, inspirado em Wordle e Termo. Leia o versículo, descubra o livro, capítulo e versículo em seis tentativas. Jogo gratuito, sem cadastro, com progresso salvo no navegador.
+Dois jogos bíblicos diários, inspirados em Wordle e Termo. Em **Referência**, descubra o livro, capítulo e versículo. Em **Palavra**, complete uma palavra de cinco letras omitida no versículo, com a referência visível. São seis tentativas por modo, com progresso e estatísticas independentes neste navegador. Gratuito e sem cadastro.
+
+O seletor da página inicial abre cada modo; `/?modo=palavra` leva diretamente ao novo jogo. As referências dos modos são diferentes no mesmo dia. Acentos e cedilha são equivalentes às letras sem diacríticos. As respostas vêm da seleção revisada em `word-game.js`; os palpites aceitos são as palavras de cinco letras do corpus da Bíblia Livre. Todas as ocorrências da resposta ficam ocultas, inclusive no texto compartilhado.
 
 ## Desenvolvimento
 

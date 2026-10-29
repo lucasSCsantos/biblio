@@ -1,6 +1,10 @@
+const wordMode = new URLSearchParams(location.search).get("modo") === "palavra";
+const storage = wordMode
+  ? { state: "biblio-palavra-state", stats: "biblio-palavra-stats" }
+  : { state: "state", stats: "stats" };
 const global = {
   chances: 6,
-  boxes: 6,
+  boxes: wordMode ? 5 : 6,
 };
 
 let revealing = false;
@@ -43,11 +47,36 @@ async function startUp() {
   main.textContent = "Carregando o desafio…";
   main.dataset.ready = "false";
   try {
+    document.querySelectorAll("[data-game-mode]").forEach((link) => {
+      if ((link.dataset.gameMode === "palavra") === wordMode)
+        link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+    document.getElementById("stats-title").textContent =
+      `Meu progresso · ${wordMode ? "Palavra" : "Referência"}`;
+    if (wordMode) {
+      document.querySelector(".game-note").textContent =
+        "Descubra a palavra de cinco letras. Acentos e cedilha são equivalentes às letras sem acento. Tradução: Bíblia Livre.";
+      document.querySelector(".game-toolbar a").href =
+        "como-jogar.html#palavra";
+    }
     setState();
-    const { book, chapter, verse } = await getRandomVerse();
-    setSecret(book, chapter, verse);
+    const reference = await getRandomVerse();
+    const { book, chapter, verse } = reference;
     main.textContent = "";
-    await drawVersicle(main, book, chapter, verse);
+    if (wordMode) {
+      const hash = await sha256(
+        `${getUserDate().toISOString().slice(0, 10)}:palavra-v1`,
+      );
+      const challenge = await wordGame.challenge(reference, hash);
+      for (const [key, value] of Object.entries(challenge))
+        updateState(key, value);
+      updateState("answer", `${challenge.answerWord} — ${challenge.reference}`);
+      drawPassage(main, challenge.maskedVersicle, challenge.reference);
+    } else {
+      setSecret(book, chapter, verse);
+      await drawVersicle(main, book, chapter, verse);
+    }
     drawGrid(main, global.chances, global.boxes);
     drawKeyboard(main);
     keyboardEvent();
@@ -60,6 +89,16 @@ async function startUp() {
     main.dataset.ready = "true";
     document.getElementById("stats").disabled = false;
     document.dispatchEvent(new Event("biblio:ready"));
+    const refreshIfExpired = () => {
+      if (Date.now() >= getState().expirationTime) location.reload();
+    };
+    setTimeout(
+      refreshIfExpired,
+      Math.max(0, getState().expirationTime - Date.now()) + 100,
+    );
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshIfExpired();
+    });
   } catch {
     main.textContent = "";
     const message = document.createElement("p");
@@ -91,17 +130,19 @@ function validProgress(state) {
         Array.isArray(row) &&
         row.length === global.boxes &&
         row.every(
-          (letter) => typeof letter === "string" && /^[A-Z0-9]?$/.test(letter),
+          (letter) =>
+            typeof letter === "string" &&
+            (wordMode ? /^[A-Z]?$/ : /^[A-Z0-9]?$/).test(letter),
         ),
     )
   );
 }
 
 function updateState(key, value) {
-  const state = JSON.parse(localStorage.getItem("state"));
+  const state = JSON.parse(localStorage.getItem(storage.state));
 
   localStorage.setItem(
-    "state",
+    storage.state,
     JSON.stringify({
       ...state,
       [key]: value,
@@ -110,10 +151,10 @@ function updateState(key, value) {
 }
 
 function updateCurrentColumn(value) {
-  const state = JSON.parse(localStorage.getItem("state"));
+  const state = JSON.parse(localStorage.getItem(storage.state));
 
   localStorage.setItem(
-    "state",
+    storage.state,
     JSON.stringify({
       ...state,
       currentColumn: value >= 0 ? value : state.currentColumn + 1,
@@ -122,10 +163,10 @@ function updateCurrentColumn(value) {
 }
 
 function updateCurrentRow(value) {
-  const state = JSON.parse(localStorage.getItem("state"));
+  const state = JSON.parse(localStorage.getItem(storage.state));
 
   localStorage.setItem(
-    "state",
+    storage.state,
     JSON.stringify({
       ...state,
       currentRow: value >= 0 ? value : state.currentRow + 1,
@@ -141,7 +182,7 @@ function setState() {
 
   let state;
   try {
-    state = JSON.parse(localStorage.getItem("state"));
+    state = JSON.parse(localStorage.getItem(storage.state));
   } catch {
     state = null;
   }
@@ -153,14 +194,14 @@ function setState() {
     state.translation !== "blivre-2018"
   ) {
     localStorage.setItem(
-      "state",
+      storage.state,
       JSON.stringify({
         translation: "blivre-2018",
         currentRow: 0,
         currentColumn: 0,
-        grid: Array(6)
+        grid: Array(global.chances)
           .fill()
-          .map(() => Array(6).fill("")),
+          .map(() => Array(global.boxes).fill("")),
         versicle: "",
         won: false,
         gameOver: false,
@@ -172,7 +213,7 @@ function setState() {
 }
 
 function getState() {
-  return JSON.parse(localStorage.getItem("state"));
+  return JSON.parse(localStorage.getItem(storage.state));
 }
 
 async function drawVersicle(container, book, chapter, verse) {
@@ -188,11 +229,21 @@ async function drawVersicle(container, book, chapter, verse) {
     updateState("answer", getAnswer(selectedBook.name, chapter, verse));
     updateState("versicle", verseText);
   }
-  const text = document.createElement("h2");
-  text.textContent = "“" + verseText + "”";
+  drawPassage(container, verseText);
+}
+
+function drawPassage(container, verseText, reference) {
   const wrapper = document.createElement("div");
   wrapper.className = "versicle";
+  const text = document.createElement("h2");
+  text.textContent = `“${verseText}”`;
   wrapper.appendChild(text);
+  if (reference) {
+    const label = document.createElement("p");
+    label.className = "verse-reference";
+    label.textContent = reference;
+    wrapper.appendChild(label);
+  }
   container.appendChild(wrapper);
 }
 
@@ -230,15 +281,20 @@ function keyboardEvent() {
       event.altKey
     )
       return;
-    const isLetter = (key) => key.match(/[a-z]/i) && key.length === 1;
+    const normalizedKey = wordMode ? wordGame.normalize(event.key) : event.key;
+    const isLetter = (key) => /^[a-z]$/i.test(key);
     const isNumber = (key) => key.match(/^\d$/) && key.length === 1;
 
-    if (isLetter(event.key) && currentColumn < 2) {
-      addLetter(event.key);
+    if (
+      isLetter(normalizedKey) &&
+      currentColumn < (wordMode ? global.boxes : 2)
+    ) {
+      addLetter(normalizedKey);
     }
 
     if (
       isNumber(event.key) &&
+      !wordMode &&
       currentColumn >= 2 &&
       currentColumn < global.boxes
     ) {
@@ -261,15 +317,16 @@ function drawGrid(container, chances, boxes) {
   const grid = document.createElement("div");
 
   grid.className = "grid";
+  if (wordMode) grid.classList.add("word-grid");
 
   for (let i = 0; i < chances; i++) {
     for (let j = 0; j < boxes; j++) {
       const box = drawBox(i, j);
 
-      if (j === 1) {
+      if (!wordMode && j === 1) {
         box.classList.add("space");
       }
-      if (j === 4) {
+      if (!wordMode && j === 4) {
         const colon = document.createElement("p");
         colon.className = "colon";
         colon.textContent = ":";
@@ -323,6 +380,7 @@ function drawKeyboard(container) {
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Backspace"],
     ["Z", "X", "C", "V", "B", "N", "M", "Enter"],
   ];
+  if (wordMode) keys.shift();
 
   for (let i = 0; i < keys.length; i++) {
     const keyboardRow = document.createElement("div");
@@ -396,6 +454,19 @@ function onEnter() {
 
   const word = grid[currentRow];
 
+  if (wordMode) {
+    const guess = word.join("");
+    if (guess.length !== global.boxes || !wordGame.accepts(guess)) {
+      document.getElementById("game-feedback").textContent =
+        guess.length !== global.boxes
+          ? "Complete as cinco letras antes de enviar."
+          : "Palavra fora do vocabulário aceito. Tente outra sem perder uma tentativa.";
+      return;
+    }
+    revealWord(word);
+    return;
+  }
+
   if (!validateBook(word) || word.join("").length !== global.boxes) {
     cleanRow();
   } else {
@@ -463,9 +534,13 @@ function revealWord(guess) {
     revealing = false;
     updateKeyboard();
     document.getElementById("game-feedback").textContent = win
-      ? "Referência correta!"
+      ? wordMode
+        ? "Palavra correta!"
+        : "Referência correta!"
       : gameOver
-        ? "Tentativas encerradas. Veja a referência abaixo."
+        ? wordMode
+          ? "Tentativas encerradas. Veja a palavra abaixo."
+          : "Tentativas encerradas. Veja a referência abaixo."
         : `Tentativa ${currentRow + 1} enviada. Verde: posição correta. Amarelo: em outra posição. Cinza: ausente.`;
     if (win) {
       setGameWin();
@@ -484,7 +559,7 @@ function updateStats() {
 
   if (!stats.games) {
     localStorage.setItem(
-      "stats",
+      storage.stats,
       JSON.stringify({
         winStreak: won ? 1 : 0,
         games: 1,
@@ -501,7 +576,7 @@ function updateStats() {
         : 1;
     const maxStreak = stats.maxStreak > winStreak ? stats.maxStreak : winStreak;
     localStorage.setItem(
-      "stats",
+      storage.stats,
       JSON.stringify({
         winStreak,
         games: stats.games + 1,
@@ -512,14 +587,14 @@ function updateStats() {
     );
   }
 
-  const createdStats = JSON.parse(localStorage.getItem("stats"));
+  const createdStats = JSON.parse(localStorage.getItem(storage.stats));
   window.biblioTrack?.("event", "user_stats", createdStats);
 }
 
 function getStats() {
   try {
     return (
-      JSON.parse(localStorage.getItem("stats")) || {
+      JSON.parse(localStorage.getItem(storage.stats)) || {
         games: 0,
         wins: 0,
         winStreak: 0,
@@ -555,7 +630,9 @@ function setGameWin() {
 }
 
 function showAnswer() {
-  const { answer } = getState();
+  const { answer, versicle } = getState();
+  if (wordMode)
+    document.querySelector(".versicle h2").textContent = `“${versicle}”`;
   const tag = document.createElement("div");
   const tagText = document.createElement("h4");
   document.getElementById("tag")?.remove();
@@ -654,7 +731,7 @@ async function createShareContent() {
     url: "",
   };
 
-  let shareText = `Joguei bibliooo.com.br #${currentGame} 🔥${stats.winStreak}\n\n`;
+  let shareText = `Joguei bibliooo.com.br · ${wordMode ? "Palavra" : "Referência"} #${currentGame} 🔥${stats.winStreak}\n\n`;
 
   for (let i = 0; i < global.chances; i += 1) {
     let linUsed = false;
@@ -681,7 +758,8 @@ async function createShareContent() {
     if (linUsed) shareText += "\n";
   }
 
-  shareText += `\n"${versicle}" — BLIVRE\n`;
+  shareText += `\n"${wordMode ? getState().maskedVersicle : versicle}" — BLIVRE\n`;
+  if (wordMode) shareText += "https://bibliooo.com.br/?modo=palavra\n";
 
   shareData.text = shareText;
 
@@ -693,7 +771,7 @@ async function createShareContent() {
     ) {
       await navigator.share(shareData);
     } else {
-      navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareText);
       showAlert("Texto copiado!");
     }
   } catch (err) {

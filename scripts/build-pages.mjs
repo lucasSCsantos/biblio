@@ -4,7 +4,7 @@ const pages = [
   [
     "index.html",
     "Biblio — desafio bíblico diário",
-    "Descubra a referência do versículo do dia em seis tentativas. Um jogo gratuito de memória, lógica e conhecimento bíblico.",
+    "Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.",
     "Jogar",
   ],
   [
@@ -103,7 +103,7 @@ for (const [file, title, description, active] of pages) {
   <link rel="stylesheet" href="styles.css">
   <script src="site-config.js" defer></script>
   <script src="site.js" defer></script>
-${home ? '  <script src="bible-index.js" defer></script>\n  <script src="script.js" defer></script>' : ""}
+${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="script.js" defer></script>' : ""}
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>

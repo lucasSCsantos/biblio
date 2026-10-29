@@ -210,6 +210,30 @@ p {
   gap: 0;
   align-items: center;
 }
+.word-grid {
+  grid-template-columns: repeat(5, auto);
+}
+.game-modes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 12px;
+}
+.game-modes a {
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 8px 20px;
+  text-decoration: none;
+}
+.game-modes a[aria-current] {
+  color: white;
+  background: var(--accent);
+}
+.verse-reference {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 0;
+}
 .box {
   display: grid;
   place-items: center;
