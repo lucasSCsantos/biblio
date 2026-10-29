@@ -67,6 +67,10 @@ test("Jó e João têm siglas distintas nas regras", async ({ page }) => {
 });
 
 test.beforeEach(async ({ page }) => {
+  // Os cenários do jogo representam visitantes que já fecharam a apresentação.
+  await page.addInitScript(() =>
+    localStorage.setItem("biblio-palavra-intro-seen", "true"),
+  );
   // A avaliação do site não deve enviar telemetria nem pedir anúncios reais.
   await page.route(/^https:\/\//, (route) => route.abort());
 });
@@ -230,7 +234,7 @@ test("páginas públicas e navegação funcionam sem JavaScript", async ({
     page.getByRole("cell", { name: "Atos", exact: true }),
   ).toBeVisible();
   for (const [file, title] of [
-    ["guias.html", "Mais que acertar uma referência."],
+    ["guias.html", "Mais que acertar uma resposta."],
     [
       "referencias-biblicas.html",
       "Livro, capítulo e versículo: por onde começar?",

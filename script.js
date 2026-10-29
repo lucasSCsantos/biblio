@@ -10,12 +10,19 @@ const global = {
 let revealing = false;
 let dialogOpener;
 
+function setBackgroundInert(inert) {
+  document
+    .querySelectorAll(".page-shell, .site-header, .site-footer, .game-modes")
+    .forEach((element) => {
+      element.inert = inert;
+    });
+}
+
 function closeStats() {
   document.getElementById("modal").classList.add("hidden");
-  document.querySelector(".page-shell").inert = false;
-  document.querySelector(".site-header").inert = false;
-  document.querySelector(".site-footer").inert = false;
+  setBackgroundInert(false);
   dialogOpener?.focus();
+  document.dispatchEvent(new Event("biblio:stats-closed"));
 }
 
 document
@@ -269,7 +276,9 @@ function keyboardEvent() {
     const editable = event.target.closest?.(
       "input, textarea, select, a, button:not(.key)",
     );
-    const overlay = document.querySelector(".game-dialog:not(.hidden)");
+    const overlay = document.querySelector(
+      ".game-dialog:not(.hidden), dialog[open]",
+    );
     if (
       won ||
       gameOver ||
@@ -854,7 +863,7 @@ function showStatsModal() {
   const played = state.won || state.gameOver;
 
   const text = state.won ? "Parabéns!" : played ? "Que pena!" : "";
-  modalHeader.innerHTML = `${played ? text + "<br/>" : ""}<span>${played ? "Volte amanhã para um novo versículo." : "Todo dia um novo versículo!"}</span>`;
+  modalHeader.innerHTML = `${played ? text + "<br/>" : ""}<span>${played ? "Volte amanhã para um novo desafio." : "Todo dia um novo desafio neste modo!"}</span>`;
 
   const statsToShow = [
     { stat: stats.games, title: "Total de jogos" },
@@ -881,9 +890,7 @@ function showStatsModal() {
 
   dialogOpener = document.activeElement;
   modal.classList.remove("hidden");
-  document.querySelector(".page-shell").inert = true;
-  document.querySelector(".site-header").inert = true;
-  document.querySelector(".site-footer").inert = true;
+  setBackgroundInert(true);
   modal.querySelector("[data-close-dialog]").focus();
 }
 

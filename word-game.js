@@ -35,9 +35,12 @@ const wordGame = (() => {
       book.chapters.forEach((verses, chapterIndex) => {
         verses.forEach((text, verseIndex) => {
           const words = text.match(/\p{L}+/gu) || [];
+          const uniqueAnswers = new Map();
           for (const word of words) {
             const normalized = normalize(word);
             if (/^[A-Z]{5}$/.test(normalized)) vocabulary.add(normalized);
+            if (answers.has(normalized) && !uniqueAnswers.has(normalized))
+              uniqueAnswers.set(normalized, word);
           }
           if (
             book.abbrev === reference.book &&
@@ -45,17 +48,12 @@ const wordGame = (() => {
             verseIndex + 1 === reference.verse
           )
             return;
-          const uniqueAnswers = new Set(
-            words.map(normalize).filter((word) => answers.has(word)),
-          );
-          for (const secret of uniqueAnswers) {
+          for (const [secret, answerWord] of uniqueAnswers) {
             if (!candidates.has(secret)) candidates.set(secret, []);
             candidates.get(secret).push({
-              secret: secret.split(""),
               versicle: text,
-              maskedVersicle: mask(text, secret),
               reference: `${book.name} ${chapterIndex + 1}:${verseIndex + 1}`,
-              answerWord: words.find((word) => normalize(word) === secret),
+              answerWord,
             });
           }
         });
@@ -65,7 +63,12 @@ const wordGame = (() => {
     if (!words.length) throw new Error("Nenhuma palavra disponível");
     const secret = words[parseInt(hash.slice(0, 8), 16) % words.length];
     const verses = candidates.get(secret);
-    return verses[parseInt(hash.slice(8, 16), 16) % verses.length];
+    const selected = verses[parseInt(hash.slice(8, 16), 16) % verses.length];
+    return {
+      ...selected,
+      secret: secret.split(""),
+      maskedVersicle: mask(selected.versicle, secret),
+    };
   }
 
   return {

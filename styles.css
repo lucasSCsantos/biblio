@@ -214,20 +214,80 @@ p {
   grid-template-columns: repeat(5, auto);
 }
 .game-modes {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 16px 0 12px;
+  background: var(--colorFG);
+  margin: 0 0 8px;
+}
+.game-modes-inner {
+  max-width: 700px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .game-modes a {
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  padding: 8px 20px;
+  color: var(--colorBG);
+  text-align: center;
+  font-size: 13px;
+  line-height: 16px;
+  padding: 8px 12px;
+  border-bottom: 3px solid transparent;
   text-decoration: none;
 }
 .game-modes a[aria-current] {
   color: white;
-  background: var(--accent);
+  background: var(--colorKeyboard);
+  border-bottom-color: var(--colorBG);
+}
+.game-modes a:hover {
+  background: var(--colorKeyboard);
+}
+.game-modes a:focus-visible {
+  outline-color: white;
+  outline-offset: -4px;
+}
+.mode-intro {
+  position: fixed;
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  border: 0;
+  border-radius: 10px;
+  padding: 30px 24px 24px;
+  background: var(--colorModal);
+  color: white;
+}
+.mode-intro::backdrop {
+  background: rgba(40, 24, 12, 0.55);
+}
+.mode-intro h2 {
+  margin: 0 0 16px;
+  font-size: 27px;
+}
+.mode-intro p {
+  font-size: 15px;
+  line-height: 1.65;
+}
+.mode-intro .eyebrow {
+  color: var(--colorBG);
+  font-size: 10px;
+}
+.mode-intro .close-dialog {
+  color: white;
+}
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.intro-actions .button {
+  margin: 0;
+  background: var(--colorBG);
+  color: var(--colorFG);
+}
+.intro-actions button {
+  background: transparent;
+  color: white;
+  border-color: var(--line);
 }
 .verse-reference {
   color: var(--muted);
@@ -748,6 +808,10 @@ th {
 }
 .article h2 {
   font-size: 26px;
+}
+.article h3 {
+  font-size: 20px;
+  margin: 28px 0 14px;
 }
 .game-feedback {
   font-size: 12px;

@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("biblio-palavra-intro-seen", "true"),
+  );
   await page.route(/^https:\/\//, (route) => route.abort());
   await page.clock.install({ time: new Date("2026-10-31T12:00:00") });
 });

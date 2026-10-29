@@ -4,6 +4,8 @@ Dois jogos bíblicos diários, inspirados em Wordle e Termo. Em **Referência**,
 
 O seletor da página inicial abre cada modo; `/?modo=palavra` leva diretamente ao novo jogo. As referências dos modos são diferentes no mesmo dia. Acentos e cedilha são equivalentes às letras sem diacríticos. As respostas vêm da seleção revisada em `word-game.js`; os palpites aceitos são as palavras de cinco letras do corpus da Bíblia Livre. Todas as ocorrências da resposta ficam ocultas, inclusive no texto compartilhado.
 
+A barra marrom abaixo do cabeçalho permite alternar os modos. Uma apresentação do modo Palavra aparece na primeira visita ao jogo e, ao ser fechada, deixa um registro neste navegador para não se repetir.
+
 ## Desenvolvimento
 
 Requer Node.js 20 ou superior. `npm ci` instala apenas ferramentas de desenvolvimento; o site publicado não depende de bibliotecas JavaScript externas para funcionar.

@@ -17,6 +17,7 @@
   <script src="site.js" defer></script>
   <script src="bible-index.js" defer></script>
   <script src="word-game.js" defer></script>
+  <script src="mode-intro.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -24,6 +25,10 @@
   <header class="site-header"><a class="brand" href="index.html" aria-label="Biblio, página inicial">BIBLIO</a>
     <nav aria-label="Navegação principal"><a href="index.html" aria-current="page">Jogar</a><a href="como-jogar.html">Como jogar</a><a href="guias.html">Guias</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></nav>
   </header>
+  <nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
+  <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
+  <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
+</div></nav>
   <div class="page-shell"><section id="privacy-choices" class="privacy-panel" aria-labelledby="privacy-title" hidden>
   <div><p class="eyebrow">Você escolhe</p><h2 id="privacy-title" tabindex="-1">Sua privacidade, suas preferências</h2>
   <p>O progresso do jogo fica neste navegador. Análise de uso e publicidade são opcionais e só carregam com sua permissão. Você pode jogar sem aceitar.</p>
@@ -35,12 +40,6 @@
 </section>
   <main id="conteudo" class="home-content"><h1 class="sr-only">Biblio: desafio bíblico diário</h1>
 <section class="game-panel" aria-label="Desafio bíblico diário">
-  <nav class="game-modes" aria-label="Modos de jogo">
-    <a href="index.html" data-game-mode="referencia" aria-current="page"
-      >Referência</a
-    >
-    <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
-  </nav>
   <div class="game-toolbar">
     <span class="daily-label"
       ><span aria-hidden="true">●</span> Desafio do dia</span
@@ -115,9 +114,7 @@
     ><a class="guide-card" href="estrategias.html"
       ><span class="card-number">02 / Estratégia</span>
       <h3>Transforme as cores em pistas</h3>
-      <p>
-        Aprenda a comparar tentativas sem confundir números com proximidade.
-      </p>
+      <p>Use o contexto e as cores para descobrir referências e palavras.</p>
       <span class="text-link">Explorar as pistas →</span></a
     >
   </div>
@@ -138,6 +135,8 @@
     <p>
       Não. Suas tentativas e estatísticas ficam neste navegador. Se você apagar
       os dados do site ou trocar de dispositivo, o histórico não acompanha você.
+      Cada modo tem sua própria partida e estatísticas: jogar um não consome as
+      tentativas do outro.
     </p>
   </details>
   <details>
@@ -151,6 +150,37 @@
 </section>
 </main>
   </div>
+<dialog
+  id="mode-intro"
+  class="mode-intro"
+  aria-labelledby="mode-intro-title"
+  aria-describedby="mode-intro-description"
+>
+  <button
+    class="close-dialog"
+    type="button"
+    data-dismiss-intro
+    aria-label="Fechar apresentação"
+  >
+    ×
+  </button>
+  <p class="eyebrow">Novo no Biblio</p>
+  <h2 id="mode-intro-title">Temos um novo modo!</h2>
+  <p id="mode-intro-description">
+    Conheça <strong>Palavra</strong>: a referência já aparece e você descobre a
+    palavra de cinco letras que falta no versículo.
+  </p>
+  <p>
+    São seis tentativas, com pistas por cores. Jogue Referência e Palavra todos
+    os dias, com progressos separados.
+  </p>
+  <div class="intro-actions">
+    <a class="button" href="index.html?modo=palavra" data-try-word
+      >Jogar Palavra</a
+    >
+    <button type="button" data-dismiss-intro autofocus>Continuar</button>
+  </div>
+</dialog>
 <div
   id="modal"
   class="game-dialog hidden"
@@ -196,7 +226,7 @@
   </div>
 </div>
 
-  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e um novo versículo a cada dia.</p></div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
     <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
     <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
   </footer>

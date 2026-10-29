@@ -1,11 +1,5 @@
 <h1 class="sr-only">Biblio: desafio bíblico diário</h1>
 <section class="game-panel" aria-label="Desafio bíblico diário">
-  <nav class="game-modes" aria-label="Modos de jogo">
-    <a href="index.html" data-game-mode="referencia" aria-current="page"
-      >Referência</a
-    >
-    <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
-  </nav>
   <div class="game-toolbar">
     <span class="daily-label"
       ><span aria-hidden="true">●</span> Desafio do dia</span
@@ -80,9 +74,7 @@
     ><a class="guide-card" href="estrategias.html"
       ><span class="card-number">02 / Estratégia</span>
       <h3>Transforme as cores em pistas</h3>
-      <p>
-        Aprenda a comparar tentativas sem confundir números com proximidade.
-      </p>
+      <p>Use o contexto e as cores para descobrir referências e palavras.</p>
       <span class="text-link">Explorar as pistas →</span></a
     >
   </div>
@@ -103,6 +95,8 @@
     <p>
       Não. Suas tentativas e estatísticas ficam neste navegador. Se você apagar
       os dados do site ou trocar de dispositivo, o histórico não acompanha você.
+      Cada modo tem sua própria partida e estatísticas: jogar um não consome as
+      tentativas do outro.
     </p>
   </details>
   <details>
@@ -115,6 +109,37 @@
   </details>
 </section>
 <!-- GAME_DIALOG -->
+<dialog
+  id="mode-intro"
+  class="mode-intro"
+  aria-labelledby="mode-intro-title"
+  aria-describedby="mode-intro-description"
+>
+  <button
+    class="close-dialog"
+    type="button"
+    data-dismiss-intro
+    aria-label="Fechar apresentação"
+  >
+    ×
+  </button>
+  <p class="eyebrow">Novo no Biblio</p>
+  <h2 id="mode-intro-title">Temos um novo modo!</h2>
+  <p id="mode-intro-description">
+    Conheça <strong>Palavra</strong>: a referência já aparece e você descobre a
+    palavra de cinco letras que falta no versículo.
+  </p>
+  <p>
+    São seis tentativas, com pistas por cores. Jogue Referência e Palavra todos
+    os dias, com progressos separados.
+  </p>
+  <div class="intro-actions">
+    <a class="button" href="index.html?modo=palavra" data-try-word
+      >Jogar Palavra</a
+    >
+    <button type="button" data-dismiss-intro autofocus>Continuar</button>
+  </div>
+</dialog>
 <div
   id="modal"
   class="game-dialog hidden"

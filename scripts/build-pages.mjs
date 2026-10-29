@@ -10,13 +10,13 @@ const pages = [
   [
     "como-jogar.html",
     "Como jogar Biblio",
-    "Aprenda as regras do Biblio, as siglas dos livros e o significado das cores de cada tentativa.",
+    "Aprenda a jogar os modos Referência e Palavra do Biblio: seis tentativas, pistas por cores e dois desafios diários.",
     "Como jogar",
   ],
   [
     "guias.html",
     "Guias para ler e jogar",
-    "Entenda referências bíblicas e aprenda estratégias para aproveitar o desafio diário do Biblio.",
+    "Entenda referências bíblicas e aprenda estratégias para os modos Referência e Palavra do Biblio.",
     "Guias",
   ],
   [
@@ -58,7 +58,7 @@ const nav = [
   ["contato.html", "Contato"],
 ];
 const bible = JSON.parse(fs.readFileSync("bible.json", "utf8"));
-const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros disponíveis no jogo</caption><thead><tr><th scope="col">Sigla</th><th scope="col">Livro</th></tr></thead><tbody>${bible
+const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros disponíveis no modo Referência</caption><thead><tr><th scope="col">Sigla</th><th scope="col">Livro</th></tr></thead><tbody>${bible
   .filter((b) => b.abbrev.length === 2)
   .map(
     (b) =>
@@ -77,6 +77,10 @@ const privacy = `<section id="privacy-choices" class="privacy-panel" aria-labell
   <div class="button-row"><button id="privacy-reject" type="button">Recusar opcionais</button><button id="privacy-save" type="button">Salvar escolhas</button></div>
   <p id="privacy-status" role="status"></p></div>
 </section>`;
+const gameModes = `<nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
+  <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
+  <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
+</div></nav>`;
 for (const [file, title, description, active] of pages) {
   const [body, dialog = ""] = fs
     .readFileSync(`content/${file}`, "utf8")
@@ -103,17 +107,17 @@ for (const [file, title, description, active] of pages) {
   <link rel="stylesheet" href="styles.css">
   <script src="site-config.js" defer></script>
   <script src="site.js" defer></script>
-${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="script.js" defer></script>' : ""}
+${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="mode-intro.js" defer></script>\n  <script src="script.js" defer></script>' : ""}
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
   <header class="site-header"><a class="brand" href="index.html" aria-label="Biblio, página inicial">BIBLIO</a>
     <nav aria-label="Navegação principal">${nav.map(([url, label]) => `<a href="${url}"${label === active ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>
   </header>
-  <div class="page-shell">${privacy}
+${home ? `  ${gameModes}\n` : ""}  <div class="page-shell">${privacy}
   <main id="conteudo"${home ? ' class="home-content"' : ' class="article"'}>${body}</main>
   </div>${dialog}
-  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e um novo versículo a cada dia.</p></div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
     <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
     <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
   </footer>
