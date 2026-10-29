@@ -1,0 +1,154 @@
+<h1 class="sr-only">Biblio: desafio bíblico diário</h1>
+<section class="game-panel" aria-label="Desafio bíblico diário">
+  <div class="game-toolbar">
+    <span class="daily-label"
+      ><span aria-hidden="true">●</span> Desafio do dia</span
+    >
+    <div>
+      <a href="como-jogar.html">Como jogar</a
+      ><button type="button" id="stats" disabled onclick="showStatsModal()">
+        Meu progresso
+      </button>
+    </div>
+  </div>
+  <div id="game" aria-label="Tabuleiro e teclado">
+    <p>Carregando o desafio…</p>
+  </div>
+  <noscript
+    ><p>
+      Ative o JavaScript para jogar. Você também pode consultar as
+      <a href="como-jogar.html">regras</a> e os
+      <a href="guias.html">guias de leitura</a>.
+    </p></noscript
+  >
+  <p
+    id="game-feedback"
+    class="game-feedback"
+    role="status"
+    aria-live="polite"
+  ></p>
+  <p class="game-note">
+    Use duas letras + capítulo e versículo com dois dígitos. Exemplo:
+    <strong>MC 03:21</strong>.<br />Tradução: Bíblia Livre ·
+    <a href="como-jogar.html#livros">Veja as siglas disponíveis</a>
+  </p>
+</section>
+<aside class="ad-space" data-ad-space aria-label="Publicidade" hidden>
+  <p>Publicidade</p>
+</aside>
+<section class="intro-section">
+  <p class="eyebrow">Um pouco de memória. Um pouco de lógica.</p>
+  <h2>A passagem é a pista.<br />A referência é o desafio.</h2>
+  <p>
+    No Biblio, você recebe o texto de um versículo e tenta descobrir onde ele
+    está na Bíblia. Cada tentativa combina a sigla do livro, o capítulo e o
+    número do versículo. As cores mostram quais letras e números já estão no
+    caminho certo.
+  </p>
+  <p>
+    Você não precisa conhecer todas as referências de memória: compare as
+    pistas, ajuste sua hipótese e experimente. Ao terminar, volte à passagem e
+    leia os versículos ao redor. A descoberta continua depois da partida.
+  </p>
+  <a class="text-link" href="como-jogar.html"
+    >Conheça as regras <span aria-hidden="true">→</span></a
+  >
+</section>
+<section class="guides-section" aria-labelledby="guides-title">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Para além do tabuleiro</p>
+      <h2 id="guides-title">Leia, descubra, aprenda.</h2>
+    </div>
+    <a href="guias.html">Todos os guias →</a>
+  </div>
+  <div class="cards">
+    <a class="guide-card" href="referencias-biblicas.html"
+      ><span class="card-number">01 / Leitura</span>
+      <h3>Livro, capítulo e versículo</h3>
+      <p>
+        Entenda como uma referência funciona e por que ler o contexto faz
+        diferença.
+      </p>
+      <span class="text-link">Entender as referências →</span></a
+    ><a class="guide-card" href="estrategias.html"
+      ><span class="card-number">02 / Estratégia</span>
+      <h3>Transforme as cores em pistas</h3>
+      <p>
+        Aprenda a comparar tentativas sem confundir números com proximidade.
+      </p>
+      <span class="text-link">Explorar as pistas →</span></a
+    >
+  </div>
+</section>
+<section class="faq">
+  <h2>Antes da próxima tentativa</h2>
+  <details>
+    <summary>Todo mundo recebe o mesmo desafio?</summary>
+    <p>
+      Sim, quem está na mesma data local recebe a mesma referência. O desafio
+      muda à meia-noite do seu dispositivo. Pessoas em fusos diferentes podem
+      estar em dias diferentes.
+    </p>
+  </details>
+  <details>
+    <summary>Preciso criar uma conta?</summary>
+    <p>
+      Não. Suas tentativas e estatísticas ficam neste navegador. Se você apagar
+      os dados do site ou trocar de dispositivo, o histórico não acompanha você.
+    </p>
+  </details>
+  <details>
+    <summary>Por que a frase pode ser diferente da minha Bíblia?</summary>
+    <p>
+      Usamos a Bíblia Livre, edição Textus Receptus de fevereiro de 2018. As
+      traduções podem usar palavras diferentes para a mesma passagem. Veja os
+      <a href="sobre.html#traducao">créditos da tradução</a>.
+    </p>
+  </details>
+</section>
+<!-- GAME_DIALOG -->
+<div
+  id="modal"
+  class="game-dialog hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="stats-title"
+>
+  <div class="modal-container">
+    <button
+      class="close-dialog"
+      type="button"
+      data-close-dialog
+      aria-label="Fechar progresso"
+    >
+      ×
+    </button>
+    <h2 id="stats-title">Meu progresso</h2>
+    <div class="modal-header"><h3 class="modal-title"></h3></div>
+    <div class="modal-body">
+      <div class="stats">
+        <div class="stat" id="games">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Total de jogos</span>
+        </div>
+        <div class="stat" id="percentage">
+          <strong class="stat-number">0%</strong
+          ><span class="stat-name">Vitórias</span>
+        </div>
+        <div class="stat" id="streak">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Sequência atual</span>
+        </div>
+        <div class="stat" id="max-streak">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Sequência máxima</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" id="share-button">Compartilhar resultado</button>
+    </div>
+    <p>Estatísticas salvas apenas neste navegador.</p>
+  </div>
+</div>
