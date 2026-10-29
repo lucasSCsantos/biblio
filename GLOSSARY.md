@@ -15,3 +15,13 @@ Jogos diários de descoberta de referências bíblicas e palavras de versículos
 **Tentativa**: resposta proposta pelo jogador: uma referência com sigla de duas letras e dois dígitos para cada número no modo Referência, ou uma palavra de cinco letras no modo Palavra.
 
 **Bíblia Livre**: tradução usada nos desafios, com atribuição aos autores e permissão de redistribuição comercial.
+
+**Jogador**: participante com histórico próprio de resultados e estatísticas em cada modo de jogo.
+
+**Resultado diário**: conclusão de uma partida de um modo e dia específicos, com vitória ou derrota e quantidade de tentativas utilizadas.
+
+**Comparação diária**: comparação entre resultados concluídos do mesmo modo e dia. Vitórias em menos tentativas superam vitórias em mais tentativas; todas as vitórias superam derrotas, e resultados iguais ficam empatados.
+
+**Sequência de vitórias**: quantidade de dias consecutivos em que um jogador venceu no mesmo modo. Uma derrota ou um dia sem jogar interrompe a sequência.
+
+**Jogador ativo**: jogador que concluiu pelo menos uma partida de um modo nos últimos 30 dias, considerado nas comparações acumuladas desse modo.

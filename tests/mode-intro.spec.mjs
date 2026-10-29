@@ -46,25 +46,40 @@ test("a apresentação permite experimentar Palavra sem reaparecer", async ({
   await expect(intro).not.toBeVisible();
 });
 
-test("a barra ocupa a largura da tela e fica compacta logo abaixo do header", async ({
+test("os botões de modo são compactos e centralizados abaixo do header", async ({
   page,
 }, testInfo) => {
   await page.goto("/?modo=palavra");
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.getByRole("button", { name: "Recusar opcionais" }).click();
-  const bar = await page
+  const selector = await page
     .getByRole("navigation", { name: "Modos de jogo" })
     .boundingBox();
   const header = await page.locator(".site-header").boundingBox();
-  expect(bar.x).toBe(0);
-  expect(bar.width).toBe(page.viewportSize().width);
-  expect(bar.height).toBeLessThanOrEqual(36);
-  expect(bar.y).toBeCloseTo(header.y + header.height);
+  expect(selector.height).toBeLessThanOrEqual(36);
+  expect(selector.y).toBeCloseTo(header.y + header.height);
+  for (const name of ["Referência", "Palavra"]) {
+    const button = await page
+      .getByRole("link", { name, exact: true })
+      .boundingBox();
+    expect(button.height).toBeLessThanOrEqual(36);
+    expect(button.width).toBeLessThan(110);
+  }
+  const first = await page
+    .getByRole("link", { name: "Referência", exact: true })
+    .boundingBox();
+  const last = await page
+    .getByRole("link", { name: "Palavra", exact: true })
+    .boundingBox();
+  expect((first.x + last.x + last.width) / 2).toBeCloseTo(
+    page.viewportSize().width / 2,
+    0,
+  );
   await expect(
     page.getByRole("link", { name: "Palavra", exact: true }),
   ).toHaveAttribute("aria-current", "page");
   await page.screenshot({
-    path: `.scratch/modo-palavra/bar-${testInfo.project.name}.png`,
+    path: `.scratch/modo-palavra/buttons-${testInfo.project.name}.png`,
     fullPage: true,
   });
 });

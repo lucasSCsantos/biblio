@@ -214,35 +214,35 @@ p {
   grid-template-columns: repeat(5, auto);
 }
 .game-modes {
-  background: var(--colorFG);
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 }
 .game-modes-inner {
   max-width: 700px;
   margin: auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
 }
 .game-modes a {
-  color: var(--colorBG);
+  color: var(--colorFG);
   text-align: center;
   font-size: 13px;
-  line-height: 16px;
-  padding: 8px 12px;
-  border-bottom: 3px solid transparent;
+  line-height: 18px;
+  padding: 7px 16px;
+  border: 1px solid var(--colorFG);
+  border-radius: 5px;
   text-decoration: none;
 }
 .game-modes a[aria-current] {
   color: white;
-  background: var(--colorKeyboard);
-  border-bottom-color: var(--colorBG);
+  background: var(--colorFG);
 }
 .game-modes a:hover {
-  background: var(--colorKeyboard);
+  background: var(--colorFG);
+  color: white;
 }
 .game-modes a:focus-visible {
-  outline-color: white;
-  outline-offset: -4px;
+  outline-offset: 2px;
 }
 .mode-intro {
   position: fixed;
