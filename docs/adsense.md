@@ -12,12 +12,12 @@ O site continua estático. `npm run build` gera as páginas HTML e o sitemap a p
 
 ## Ativar o bloco de anúncios depois da preparação da conta
 
-Por padrão, `adsEnabled` é `false` e `adSlot` está vazio. O espaço abaixo do jogo permanece oculto e nenhum script publicitário é carregado. O metadado no HTML permite a verificação de propriedade sem carregar anúncios antes da escolha do visitante.
+`adsEnabled` está ativo e `adSlot` permanece vazio até configurar um bloco manual. O carregador AdSense equivalente ao snippet do editor é inserido apenas na página do jogo, depois que a pessoa permite publicidade e a partida carrega. Sem o ID numérico do bloco, o espaço manual continua oculto. O snippet não é estático no HTML para respeitar a escolha de consentimento.
 
 1. Crie um bloco responsivo no AdSense e copie seu identificador numérico para `adSlot` em `site-config.js`.
 2. Configure Privacidade e mensagens no painel. Para visitantes do EEE, Reino Unido e Suíça, configure uma CMP certificada pelo Google (por exemplo, a mensagem europeia do próprio AdSense). As escolhas locais deste site **não são uma CMP certificada** e não substituem essa obrigação. Verifique a mensagem, os parceiros e as opções de revogação no ambiente publicado antes de liberar a veiculação.
-3. Mantenha anúncios automáticos desativados: o projeto usa somente o bloco manual abaixo do jogo. Ativar Auto ads no painel pode criar posições que este código não controla.
-4. Só então mude `adsEnabled` para `true` e publique a configuração. O bloco continua dependendo de permissão de publicidade pelo visitante e de uma partida carregada com sucesso. Não exibimos blocos nas páginas informativas nem em telas de erro.
+3. Mantenha anúncios automáticos desativados: o projeto controla o bloco manual abaixo do jogo. Ativar Auto ads no painel pode criar posições que este código não controla.
+4. Depois de informar o `adSlot`, publique a configuração. A veiculação continua dependendo de permissão de publicidade e de uma partida carregada com sucesso. Não exibimos o bloco manual nas páginas informativas nem em telas de erro.
 5. Verifique a renderização real em celular e computador e os diagnósticos da conta. Ao testar, não clique nos próprios anúncios. Solicitações sem anúncio disponível podem deixar o espaço vazio.
 
 O Analytics é independente: só carrega depois de o visitante selecionar a opção de análise de uso. Os eventos do jogo não criam uma fila para envio antes dessa escolha. Ao revogar categorias ativas, o site recarrega para encerrar os scripts. A remoção de cookies de terceiros continua sujeita ao navegador.

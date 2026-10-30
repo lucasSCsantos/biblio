@@ -66,11 +66,15 @@
     if (
       choice.advertising &&
       config.adsEnabled &&
-      /^\d+$/.test(config.adSlot) &&
       slot &&
-      document.querySelector("#game[data-ready='true']")
+      document.querySelector("#game[data-ready='true']") &&
+      config.publisherId
     ) {
-      if (slot.querySelector("ins")) return;
+      script(
+        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(config.publisherId)}`,
+        "biblio-adsense",
+      );
+      if (!/^\d+$/.test(config.adSlot) || slot.querySelector("ins")) return;
       slot.hidden = false;
       const ad = document.createElement("ins");
       ad.className = "adsbygoogle";
@@ -80,10 +84,6 @@
       ad.dataset.adFormat = "auto";
       ad.dataset.fullWidthResponsive = "true";
       slot.appendChild(ad);
-      script(
-        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(config.publisherId)}`,
-        "biblio-adsense",
-      );
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     }
   }

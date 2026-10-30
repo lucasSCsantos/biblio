@@ -217,6 +217,31 @@ test("a publicidade configurada só ocupa o espaço abaixo do jogo após permiss
   await expect(page.locator("[data-ad-space] ins")).toHaveCount(1);
 });
 
+test("o snippet do AdSense espera consentimento mesmo sem ID de bloco manual", async ({
+  page,
+}) => {
+  const adRequests = [];
+  await page.route(
+    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js**",
+    async (route) => {
+      adRequests.push(route.request().url());
+      await route.fulfill({
+        contentType: "application/javascript",
+        body: "window.adsbygoogle = window.adsbygoogle || [];",
+      });
+    },
+  );
+  await page.goto("/");
+  await expect(page.locator(".grid .box")).toHaveCount(36);
+  expect(adRequests).toEqual([]);
+  await page.getByLabel("Permitir publicidade", { exact: false }).check();
+  await page.getByRole("button", { name: "Salvar escolhas" }).click();
+  await expect(page.locator("#biblio-adsense")).toHaveCount(1);
+  expect(adRequests).toHaveLength(1);
+  await expect(page.locator("[data-ad-space]")).toBeHidden();
+  await expect(page.locator("[data-ad-space] ins")).toHaveCount(0);
+});
+
 test("páginas públicas e navegação funcionam sem JavaScript", async ({
   browser,
 }) => {
