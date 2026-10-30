@@ -10,10 +10,24 @@
     .slice(0, 10);
 
   document.getElementById("stats-mode-title").textContent = title;
+  window.biblioTrack?.("event", "statistics_open", {
+    surface: "statistics_page",
+    mode,
+    challenge_day: challengeDay,
+  });
   document.querySelectorAll("[data-stats-mode]").forEach((link) => {
     if (link.dataset.statsMode === mode)
       link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
+    link.addEventListener("click", () => {
+      if (link.dataset.statsMode !== mode)
+        window.biblioTrack?.("event", "mode_changed", {
+          from_mode: mode,
+          to_mode: link.dataset.statsMode,
+          surface: "statistics_page",
+          challenge_day: challengeDay,
+        });
+    });
   });
   document.getElementById("back-to-game").href =
     mode === "palavra" ? "index.html?modo=palavra" : "index.html";

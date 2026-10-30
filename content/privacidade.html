@@ -13,8 +13,16 @@
   o registro de que você já fechou a apresentação do modo Palavra. As partidas
   de Referência e Palavra são independentes e renovadas diariamente. As
   estatísticas permanecem até você apagar os dados do site; as preferências
-  opcionais são solicitadas novamente após 180 dias. Esses registros locais não
-  são enviados pelo jogo a um banco de dados do Biblio.
+  opcionais são solicitadas novamente após 180 dias. A partida e as estatísticas
+  completas ficam neste navegador. Ao concluir um desafio, o resultado (modo,
+  data local, vitória ou derrota e número de tentativas) também pode ser enviado
+  ao serviço de comparações do Biblio, independentemente da permissão de
+  Analytics. O texto do palpite e a resposta digitada não são enviados. Para
+  calcular estatísticas, o serviço recebe um identificador aleatório persistido
+  neste navegador e armazena seu hash, sem nome, e-mail ou cadastro. Apagar os
+  dados do site ou trocar de navegador cria outra identidade; isso não apaga
+  resultados já enviados. Os resultados ficam armazenados enquanto o serviço
+  operar; no momento não há rotina automática de exclusão.
 </p>
 <p>
   Se você trocar de dispositivo, navegador ou usar uma sessão privada, poderá
@@ -33,7 +41,13 @@
 </p>
 <p>
   Sem sua autorização, o script de análise não é carregado e eventos do jogo não
-  são enviados a ele. A política de tratamento do Google está em
+  são enviados a ele. Com sua permissão, registramos início e conclusão de
+  partida, palpites válidos (sem o texto digitado), mudança de modo, abertura
+  explícita das estatísticas e clique/resultado observável do compartilhamento.
+  Eventos ocorridos antes da permissão não são guardados para envio posterior.
+  Um resultado de compartilhamento indica apenas o que o navegador informou
+  (por exemplo, cópia concluída ou janela fechada); não confirma publicação
+  externa. A política de tratamento do Google está em
   <a href="https://policies.google.com/privacy">Privacidade do Google</a> e
   <a href="https://policies.google.com/technologies/partner-sites"
     >Como o Google usa informações de sites parceiros</a
@@ -81,8 +95,14 @@
 </button>
 <h2>Hospedagem, links e mensagens</h2>
 <p>
-  A hospedagem pode processar dados técnicos necessários à entrega e segurança
-  das páginas, como endereço IP, data de acesso e recurso solicitado. Links
+  A hospedagem do site e do serviço de comparações pode processar metadados
+  técnicos necessários à entrega, roteamento e segurança das requisições,
+  incluindo endereço IP, data de acesso e recurso solicitado. Isso é separado
+  dos dados de resultado guardados pelo Biblio. A infraestrutura Cloudflare
+  também pode tratar dados conforme sua
+  <a href="https://www.cloudflare.com/privacypolicy/">política de privacidade</a>
+  e informações sobre <a href="https://www.cloudflare.com/trust-hub/gdpr/">proteção de dados</a>.
+  Links
   externos levam a serviços com suas próprias políticas. Ao usar um link de
   e-mail, seu provedor também participa do envio.
 </p>

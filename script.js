@@ -59,6 +59,16 @@ async function startUp() {
       if ((link.dataset.gameMode === "palavra") === wordMode)
         link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
+      link.addEventListener("click", () => {
+        const fromMode = wordMode ? "palavra" : "referencia";
+        const toMode = link.dataset.gameMode;
+        if (fromMode !== toMode)
+          window.biblioTrack?.(
+            "event",
+            "mode_changed",
+            analyticsContext({ from_mode: fromMode, to_mode: toMode }),
+          );
+      });
     });
     document.getElementById("stats-title").textContent =
       `Meu progresso · ${wordMode ? "Palavra" : "Referência"}`;
@@ -453,6 +463,8 @@ function keyboardClick(key) {
 function addLetter(letter) {
   const { currentColumn, currentRow, grid } = getState();
 
+  trackGameStarted();
+
   grid[currentRow][currentColumn] = letter.toUpperCase();
 
   updateState("grid", grid);
@@ -509,6 +521,11 @@ function revealWord(guess) {
   if (revealing) return;
   revealing = true;
   const { secret, currentRow } = getState();
+  window.biblioTrack?.(
+    "event",
+    "guess_submitted",
+    analyticsContext({ attempt_number: currentRow + 1 }),
+  );
   const animationDelay = 500;
   const finishDelay = (7 * animationDelay) / 2;
   const colors = guessColors(guess, secret);
@@ -598,15 +615,32 @@ function updateStats() {
     );
   }
 
-  const createdStats = JSON.parse(localStorage.getItem(storage.stats));
   const completed = getState();
+  if (!completed.analyticsComplete) {
+    updateState("analyticsComplete", true);
+    window.biblioTrack?.(
+      "event",
+      "game_complete",
+      analyticsContext({
+        won: completed.won === true,
+        attempts: completed.currentRow + 1,
+      }),
+    );
+  }
+  const createdStats = JSON.parse(localStorage.getItem(storage.stats));
   window.BiblioResults?.record({
     mode: wordMode ? "palavra" : "referencia",
     day: completed.challengeDay || getUserDate().toISOString().slice(0, 10),
     won: completed.won,
     attempts: completed.currentRow + 1,
   });
-  window.biblioTrack?.("event", "user_stats", createdStats);
+  window.biblioTrack?.("event", "user_stats", {
+    ...createdStats,
+    ...analyticsContext({
+      won: completed.won === true,
+      attempts: completed.currentRow + 1,
+    }),
+  });
 }
 
 function renderDailyComparison() {
@@ -762,9 +796,15 @@ function updateBox() {
 }
 
 async function createShareContent() {
+  const state = getState();
+  const context = analyticsContext({
+    won: state.won === true,
+    attempts: state.currentRow + 1,
+  });
   window.biblioTrack?.("event", "share_button_click", {
     event_category: "Social",
     event_label: "User clicked the share button",
+    ...context,
   });
 
   const stats = getStats();
@@ -808,19 +848,31 @@ async function createShareContent() {
 
   shareData.text = shareText;
 
+  let method = "clipboard";
+  let outcome = "failed";
   try {
     if (
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent,
       )
     ) {
+      method = "web_share";
       await navigator.share(shareData);
+      outcome = "shared";
     } else {
       await navigator.clipboard.writeText(shareText);
+      outcome = "copied";
       showAlert("Texto copiado!");
     }
   } catch (err) {
+    outcome = err?.name === "AbortError" ? "cancelled" : "failed";
     console.error(`Error: ${err}`);
+  } finally {
+    window.biblioTrack?.("event", "share_action_result", {
+      ...context,
+      method,
+      outcome,
+    });
   }
 }
 
@@ -886,9 +938,15 @@ function setSecret(book, chapter, verse) {
   updateState("secret", answer.split(""));
 }
 
-function showStatsModal() {
+function showStatsModal(source = "automatic") {
   const stats = getStats();
   const state = getState();
+  if (source === "manual")
+    window.biblioTrack?.(
+      "event",
+      "statistics_open",
+      analyticsContext({ surface: "game_modal" }),
+    );
   const percentage = stats.games ? (stats.wins * 100) / stats.games : 0;
 
   const modal = document.getElementById("modal");
@@ -943,6 +1001,24 @@ function getUserDate() {
   const timezoneOffset = currentDate.getTimezoneOffset();
   const offsetMilliseconds = timezoneOffset * 60 * 1000;
   return new Date(currentDate.getTime() - offsetMilliseconds);
+}
+
+function analyticsContext(extra = {}) {
+  const state = getState();
+  return {
+    mode: wordMode ? "palavra" : "referencia",
+    challenge_day:
+      state.challengeDay || getUserDate().toISOString().slice(0, 10),
+    challenge_number: state.currentGame,
+    ...extra,
+  };
+}
+
+function trackGameStarted() {
+  const state = getState();
+  if (state.started || state.won || state.gameOver) return;
+  updateState("started", true);
+  window.biblioTrack?.("event", "game_start", analyticsContext());
 }
 
 function getDateOne() {

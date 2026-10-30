@@ -1,6 +1,6 @@
 # Biblio
 
-Dois jogos bíblicos diários, inspirados em Wordle e Termo. Em **Referência**, descubra o livro, capítulo e versículo. Em **Palavra**, complete uma palavra de cinco letras omitida no versículo, com a referência visível. São seis tentativas por modo, com progresso e estatísticas independentes neste navegador. Gratuito e sem cadastro.
+Dois jogos bíblicos diários, inspirados em Wordle e Termo. Em **Referência**, descubra o livro, capítulo e versículo. Em **Palavra**, complete uma palavra de cinco letras omitida no versículo, com a referência visível. São seis tentativas por modo, com progresso e estatísticas independentes neste navegador. Resultados concluídos também alimentam as comparações coletivas sem exigir cadastro e independentemente do Analytics opcional.
 
 O seletor da página inicial abre cada modo; `/?modo=palavra` leva diretamente ao novo jogo. As referências dos modos são diferentes no mesmo dia. Acentos e cedilha são equivalentes às letras sem diacríticos. As respostas vêm da seleção revisada em `word-game.js`; os palpites aceitos são as palavras de cinco letras do corpus da Bíblia Livre. Todas as ocorrências da resposta ficam ocultas, inclusive no texto compartilhado.
 
@@ -8,7 +8,7 @@ Os botões compactos abaixo do cabeçalho permitem alternar os modos. Uma aprese
 
 ## Desenvolvimento
 
-Requer Node.js 20 ou superior. `npm ci` instala apenas ferramentas de desenvolvimento; o site publicado não depende de bibliotecas JavaScript externas para funcionar.
+Requer Node.js 22 ou superior. `npm ci` instala ferramentas de desenvolvimento; o site publicado não depende de bibliotecas JavaScript externas para funcionar.
 
 ```sh
 npm run build
@@ -17,7 +17,7 @@ npm run dev
 
 Acesse http://127.0.0.1:4173. Use HTTP em vez de abrir `index.html` diretamente: o navegador precisa carregar `bible.json` por fetch.
 
-Edite os textos em `content/`; o cabeçalho, rodapé e metadados ficam em `scripts/build-pages.mjs`. Execute o build depois das alterações e publique os HTML gerados. Os detalhes de publicação e ativação de anúncios estão em [docs/adsense.md](docs/adsense.md).
+Edite os textos em `content/`; o cabeçalho, rodapé e metadados ficam em `scripts/build-pages.mjs`. Execute o build depois das alterações e publique os HTML gerados. Veja [configuração de comparações](docs/comparisons-deployment.md), [eventos de Analytics](docs/analytics.md) e os detalhes de anúncios em [docs/adsense.md](docs/adsense.md).
 
 ## Verificação
 
