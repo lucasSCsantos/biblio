@@ -54,6 +54,7 @@ async function startUp() {
   main.textContent = "Carregando o desafio…";
   main.dataset.ready = "false";
   try {
+    window.BiblioResults?.initialize();
     document.querySelectorAll("[data-game-mode]").forEach((link) => {
       if ((link.dataset.gameMode === "palavra") === wordMode)
         link.setAttribute("aria-current", "page");
@@ -213,6 +214,7 @@ function setState() {
         won: false,
         gameOver: false,
         currentGame: getSequentialNumber(),
+        challengeDay: getUserDate().toISOString().slice(0, 10),
         expirationTime: Date.now() + timeUntilMidnight,
       }),
     );
@@ -597,8 +599,42 @@ function updateStats() {
   }
 
   const createdStats = JSON.parse(localStorage.getItem(storage.stats));
+  const completed = getState();
+  window.BiblioResults?.record({
+    mode: wordMode ? "palavra" : "referencia",
+    day: completed.challengeDay || getUserDate().toISOString().slice(0, 10),
+    won: completed.won,
+    attempts: completed.currentRow + 1,
+  });
   window.biblioTrack?.("event", "user_stats", createdStats);
 }
+
+function renderDailyComparison() {
+  const element = document.getElementById("daily-comparison");
+  if (!element) return;
+  const state = getState();
+  if (!state.won && !state.gameOver) {
+    element.textContent = "";
+    return;
+  }
+  const view = window.BiblioResults?.snapshot(
+    wordMode ? "palavra" : "referencia",
+    state.challengeDay || getUserDate().toISOString().slice(0, 10),
+  );
+  if (view?.status === "ready" && view.data.daily?.result) {
+    const daily = view.data.daily;
+    element.textContent = daily.first
+      ? "Você foi o primeiro a concluir o desafio de hoje!"
+      : `Você superou ${daily.percentage}% dos outros jogadores até agora.`;
+  } else {
+    element.textContent =
+      view?.status === "pending"
+        ? "Seu resultado está salvo neste navegador. Aguardando envio para comparar."
+        : "Comparações indisponíveis no momento.";
+  }
+}
+
+document.addEventListener("biblio:results-updated", renderDailyComparison);
 
 function getStats() {
   try {
@@ -892,6 +928,11 @@ function showStatsModal() {
   modal.classList.remove("hidden");
   setBackgroundInert(true);
   modal.querySelector("[data-close-dialog]").focus();
+  renderDailyComparison();
+  window.BiblioResults?.refresh(
+    wordMode ? "palavra" : "referencia",
+    state.challengeDay || getUserDate().toISOString().slice(0, 10),
+  );
 }
 
 function getUserDate() {

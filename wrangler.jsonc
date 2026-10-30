@@ -1,0 +1,12 @@
+{
+  "name": "biblio-results",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-07-30",
+  "vars": { "ALLOWED_ORIGIN": "https://bibliooo.com.br" },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "biblio-results",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "worker/migrations"
+  }]
+}
