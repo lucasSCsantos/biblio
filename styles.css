@@ -807,6 +807,73 @@ th {
   color: #24170c;
   border: 0;
 }
+.modal-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.statistics-modes {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 24px;
+}
+.statistics-modes a {
+  border: 1px solid var(--colorFG);
+  border-radius: 5px;
+  color: var(--colorFG);
+  padding: 7px 14px;
+  text-decoration: none;
+}
+.statistics-modes a[aria-current="page"] {
+  color: white;
+  background: var(--colorFG);
+}
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.statistics-card {
+  padding: 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  text-align: center;
+}
+.statistics-card dt {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.statistics-card dd {
+  margin: 8px 0 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+.statistics-status,
+.statistics-import {
+  padding: 12px 14px;
+  border-left: 3px solid var(--colorFG);
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+}
+.statistics-history {
+  padding-left: 24px;
+}
+.statistics-history li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.statistics-history time {
+  font-size: 14px;
+}
+.statistics-history-note {
+  font-size: 14px;
+}
 .article h1 {
   font-size: clamp(28px, 5vw, 36px);
 }

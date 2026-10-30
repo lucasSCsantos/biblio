@@ -895,6 +895,9 @@ function showStatsModal() {
   const modalHeader = document.getElementsByClassName("modal-title")[0];
   const statDiv = document.querySelectorAll(".stat");
   const button = document.getElementById("share-button");
+  document.getElementById("full-statistics").href = wordMode
+    ? "estatisticas.html?modo=palavra"
+    : "estatisticas.html";
 
   const played = state.won || state.gameOver;
 

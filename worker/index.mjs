@@ -86,14 +86,9 @@ async function stats(db, id, mode, day) {
         .filter((row) => row.score > own.score)
         .reduce((sum, row) => sum + row.count, 0)
     : 0;
-  const totals = await db
-    .prepare(
-      "SELECT COUNT(*) AS games, COALESCE(SUM(won), 0) AS wins FROM results WHERE player_id = ? AND mode = ?",
-    )
-    .bind(id, mode)
-    .first();
+  const totals = await playerStats(db, id, mode, day);
   return {
-    stats: { ...totals },
+    stats: totals.stats,
     daily: {
       result: own
         ? { day: own.day, won: Boolean(own.won), attempts: own.attempts }
@@ -104,6 +99,83 @@ async function stats(db, id, mode, day) {
         own && otherPlayers ? Math.floor((beaten * 100) / otherPlayers) : null,
       first: Boolean(own && otherPlayers === 0),
     },
+  };
+}
+
+async function playerStats(db, id, mode, asOfDay) {
+  const player = await db
+    .prepare("SELECT baseline FROM players WHERE id = ?")
+    .bind(id)
+    .first();
+  let imported = {};
+  try {
+    imported = JSON.parse(player.baseline)?.[mode] || {};
+  } catch {
+    imported = {};
+  }
+  const history = await db
+    .prepare(
+      "SELECT day, won, attempts FROM results WHERE player_id = ? AND mode = ? ORDER BY day ASC",
+    )
+    .bind(id, mode)
+    .all();
+  const base = {
+    games: Number.isSafeInteger(imported.games) ? imported.games : 0,
+    wins: Number.isSafeInteger(imported.wins) ? imported.wins : 0,
+    winStreak: Number.isSafeInteger(imported.winStreak)
+      ? imported.winStreak
+      : 0,
+    maxStreak: Number.isSafeInteger(imported.maxStreak)
+      ? imported.maxStreak
+      : 0,
+    lastWinDay: validDay(imported.lastWinDay) ? imported.lastWinDay : null,
+    lastPlayedDay: validDay(imported.lastPlayedDay)
+      ? imported.lastPlayedDay
+      : null,
+  };
+  let current = base.winStreak;
+  let maxStreak = base.maxStreak;
+  let previousDay = base.lastPlayedDay || base.lastWinDay;
+  const millisecondsPerDay = 86400000;
+
+  for (const result of history.results) {
+    const distance = previousDay
+      ? (Date.parse(`${result.day}T00:00:00Z`) -
+          Date.parse(`${previousDay}T00:00:00Z`)) /
+        millisecondsPerDay
+      : 0;
+    if (result.won) {
+      current = distance === 1 && current > 0 ? current + 1 : 1;
+      maxStreak = Math.max(maxStreak, current);
+    } else {
+      current = 0;
+    }
+    previousDay = result.day;
+  }
+
+  if (
+    current > 0 &&
+    (!previousDay ||
+      (Date.parse(`${asOfDay}T00:00:00Z`) -
+        Date.parse(`${previousDay}T00:00:00Z`)) /
+        millisecondsPerDay >
+        1)
+  )
+    current = 0;
+
+  return {
+    stats: {
+      games: base.games + history.results.length,
+      wins: base.wins + history.results.filter((result) => result.won).length,
+      winStreak: current,
+      maxStreak,
+    },
+    imported: base,
+    history: [...history.results].reverse().map((result) => ({
+      day: result.day,
+      won: Boolean(result.won),
+      attempts: result.attempts,
+    })),
   };
 }
 
@@ -195,6 +267,13 @@ export default {
         if (!modes.has(mode) || !validDay(day))
           return json({ error: "Consulta inválida" }, 400, cors);
         return json(await stats(env.DB, id, mode, day), 200, cors);
+      }
+      if (url.pathname === "/api/history" && request.method === "GET") {
+        const mode = url.searchParams.get("mode");
+        const day = url.searchParams.get("day");
+        if (!modes.has(mode) || !validDay(day))
+          return json({ error: "Consulta invÃ¡lida" }, 400, cors);
+        return json(await playerStats(env.DB, id, mode, day), 200, cors);
       }
       return json({ error: "Recurso não encontrado" }, 404, cors);
     } catch (error) {

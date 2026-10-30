@@ -1,0 +1,55 @@
+<section class="article statistics-page" aria-labelledby="statistics-title">
+  <p class="eyebrow">Seu progresso</p>
+  <h1 id="statistics-title">Estatísticas</h1>
+  <p>Seu histórico e suas sequências são separados por modo.</p>
+
+  <nav class="statistics-modes" aria-label="Escolher modo das estatísticas">
+    <a href="estatisticas.html" data-stats-mode="referencia">Referência</a>
+    <a href="estatisticas.html?modo=palavra" data-stats-mode="palavra"
+      >Palavra</a
+    >
+  </nav>
+  <h2 id="stats-mode-title">Referência</h2>
+  <p
+    id="stats-availability"
+    class="statistics-status"
+    role="status"
+    aria-live="polite"
+  ></p>
+
+  <dl class="statistics-grid" aria-label="Resumo do modo selecionado">
+    <div class="statistics-card">
+      <dt>Jogos concluídos</dt>
+      <dd id="stats-games">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Vitórias</dt>
+      <dd id="stats-wins">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Taxa de vitória</dt>
+      <dd id="stats-win-rate">0%</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Sequência atual</dt>
+      <dd id="stats-current-streak">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Sequência máxima</dt>
+      <dd id="stats-max-streak">0</dd>
+    </div>
+  </dl>
+
+  <p id="stats-imported" class="statistics-import" hidden></p>
+  <section aria-labelledby="stats-history-title">
+    <h2 id="stats-history-title">Resultados detalhados</h2>
+    <p class="statistics-history-note">
+      Os resultados antigos que já não têm detalhes continuam incluídos nos
+      totais importados.
+    </p>
+    <ol id="stats-history" class="statistics-history"></ol>
+  </section>
+  <a id="back-to-game" class="text-link" href="index.html"
+    >Voltar ao desafio <span aria-hidden="true">→</span></a
+  >
+</section>

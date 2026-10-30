@@ -55,19 +55,13 @@ window.BiblioResults = (() => {
     const anchor = Number.isInteger(state?.currentGame)
       ? state.currentGame
       : sequential;
-    baseline.lastWinDay =
-      Number.isInteger(raw.lastWin) && raw.lastWin > 0 && raw.lastWin <= anchor
-        ? shiftDay(stateDay, raw.lastWin - anchor)
-        : null;
-    baseline.lastPlayedDay = baseline.lastWinDay;
     let result;
     if (
       state &&
       (state.won === true || state.gameOver === true) &&
       Number.isInteger(state.currentRow) &&
       state.currentRow >= 0 &&
-      state.currentRow < 6 &&
-      baseline.games > 0
+      state.currentRow < 6
     ) {
       result = {
         mode,
@@ -76,18 +70,35 @@ window.BiblioResults = (() => {
         attempts: state.currentRow + 1,
       };
       if (!result.won && result.attempts !== 6) result = null;
-      if (result) {
-        baseline.games--;
+    }
+    const currentWinIncluded = result?.won && baseline.games > 0;
+    const lastWinOffset =
+      Number.isInteger(raw.lastWin) &&
+      raw.lastWin === anchor &&
+      !currentWinIncluded
+        ? -1
+        : raw.lastWin - anchor;
+    baseline.lastWinDay =
+      Number.isInteger(raw.lastWin) && raw.lastWin > 0 && raw.lastWin <= anchor
+        ? shiftDay(stateDay, lastWinOffset)
+        : null;
+    baseline.lastPlayedDay = baseline.lastWinDay;
+    if (result) {
+      const wasIncludedInTotals = baseline.games > 0;
+      if (wasIncludedInTotals) baseline.games--;
+      if (wasIncludedInTotals)
         baseline.wins = Math.max(0, baseline.wins - Number(result.won));
-        if (result.won) {
-          baseline.winStreak = Math.max(0, baseline.winStreak - 1);
-          baseline.lastWinDay = baseline.winStreak
-            ? shiftDay(result.day, -1)
-            : null;
-        }
-        baseline.maxStreak = Math.min(baseline.maxStreak, baseline.wins);
-        baseline.lastPlayedDay = baseline.lastWinDay;
+      if (result.won && wasIncludedInTotals) {
+        baseline.winStreak = Math.max(0, baseline.winStreak - 1);
+        baseline.lastWinDay = baseline.winStreak
+          ? shiftDay(result.day, -1)
+          : null;
       }
+      baseline.maxStreak = Math.max(
+        baseline.winStreak,
+        Math.min(baseline.maxStreak, baseline.wins),
+      );
+      baseline.lastPlayedDay = baseline.lastWinDay;
     }
     return { baseline, result };
   }
@@ -181,6 +192,73 @@ window.BiblioResults = (() => {
           : "idle",
       }
     );
+  }
+
+  function localHistory(mode, stored) {
+    const [statsKey, stateKey] = modeKeys[mode];
+    const savedStats = parse(statsKey) || {};
+    const state = parse(stateKey);
+    const currentDay = day();
+    const stateDay = Number.isFinite(state?.expirationTime)
+      ? day(new Date(state.expirationTime - 1))
+      : currentDay;
+    const sequential =
+      Math.floor((Date.now() - Date.parse("2024-04-26T00:00:00Z")) / 86400000) +
+      1;
+    const anchor = Number.isInteger(state?.currentGame)
+      ? state.currentGame
+      : sequential;
+    const lastWinOffset =
+      Number.isInteger(savedStats.lastWin) &&
+      savedStats.lastWin === anchor &&
+      state?.won !== true
+        ? -1
+        : savedStats.lastWin - anchor;
+    const lastWinDay =
+      Number.isInteger(savedStats.lastWin) &&
+      savedStats.lastWin > 0 &&
+      savedStats.lastWin <= anchor
+        ? shiftDay(stateDay, lastWinOffset)
+        : null;
+    let winStreak = Math.max(0, Number(savedStats.winStreak) || 0);
+    if (
+      winStreak > 0 &&
+      lastWinDay &&
+      (Date.parse(`${currentDay}T00:00:00Z`) -
+        Date.parse(`${lastWinDay}T00:00:00Z`)) /
+        86400000 >
+        1
+    )
+      winStreak = 0;
+
+    const byDay = new Map();
+    for (const [id, result] of Object.entries(stored?.confirmed || {})) {
+      if (id.startsWith(`${mode}:`))
+        byDay.set(id.slice(mode.length + 1), result);
+    }
+    for (const result of stored?.pending || [])
+      if (result.mode === mode) byDay.set(result.day, result);
+    if (state && (state.won || state.gameOver)) {
+      const resultDay = state.challengeDay || stateDay;
+      if (!byDay.has(resultDay))
+        byDay.set(resultDay, {
+          day: resultDay,
+          won: state.won === true,
+          attempts: state.currentRow + 1,
+        });
+    }
+    return {
+      stats: {
+        games: Math.max(0, Number(savedStats.games) || 0),
+        wins: Math.max(0, Number(savedStats.wins) || 0),
+        winStreak,
+        maxStreak: Math.max(0, Number(savedStats.maxStreak) || 0),
+      },
+      imported: stored?.baselines?.[mode] || null,
+      history: [...byDay.entries()]
+        .map(([resultDay, result]) => ({ ...result, day: resultDay }))
+        .sort((left, right) => right.day.localeCompare(left.day)),
+    };
   }
 
   function scheduleRetry() {
@@ -289,10 +367,30 @@ window.BiblioResults = (() => {
     }
   }
 
+  async function history(mode, date = day()) {
+    const stored = initialize();
+    const fallback = localHistory(mode, stored);
+    if (!api()) return { status: "disabled", data: fallback };
+    if (!(await sync()))
+      return {
+        status:
+          snapshot(mode, date).status === "pending" ? "pending" : "unavailable",
+        data: fallback,
+      };
+    try {
+      return {
+        status: "ready",
+        data: await request(`/history?mode=${mode}&day=${date}`),
+      };
+    } catch {
+      return { status: "unavailable", data: fallback };
+    }
+  }
+
   window.addEventListener("online", () => {
     clearTimeout(retry);
     retry = null;
     sync();
   });
-  return { initialize, record, refresh, snapshot, sync };
+  return { initialize, record, refresh, history, snapshot, sync };
 })();
