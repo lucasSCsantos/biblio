@@ -20,6 +20,8 @@ export async function createSiteServer({
   port = Number(process.env.BIBLIO_PORT || 4173),
   persist = false,
   results = true,
+  beforeMigration,
+  afterMigration,
 } = {}) {
   const runtime = results
     ? new Miniflare({
@@ -28,6 +30,7 @@ export async function createSiteServer({
         modules: true,
         scriptPath: path.join(root, "worker/index.mjs"),
         compatibilityDate: "2026-07-30",
+        bindings: { MEASURE_D1: "1" },
         d1Databases: { DB: "biblio-results" },
         ...(persist ? { d1Persist: path.join(root, ".scratch/d1") } : {}),
       })
@@ -37,10 +40,15 @@ export async function createSiteServer({
     for (const file of (
       await fs.readdir(path.join(root, "worker/migrations"))
     ).sort()) {
-      if (file.endsWith(".sql"))
-        await db.exec(
-          await fs.readFile(path.join(root, "worker/migrations", file), "utf8"),
+      if (file.endsWith(".sql")) {
+        await beforeMigration?.({ file, db });
+        const migration = await fs.readFile(
+          path.join(root, "worker/migrations", file),
+          "utf8",
         );
+        await db.exec(migration);
+        await afterMigration?.({ file, db, migration });
+      }
     }
   }
   const server = http.createServer(async (request, response) => {

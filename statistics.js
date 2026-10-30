@@ -37,6 +37,45 @@
       ? `${((wins * 100) / games).toFixed(1).replace(".0", "").replace(".", ",")}%`
       : "0%";
 
+  const comparisonDescriptions = {
+    games: ["comparison-games", "Você concluiu mais jogos que"],
+    wins: ["comparison-wins", "Você teve mais vitórias que"],
+    winRate: ["comparison-win-rate", "Sua taxa de vitórias foi maior que"],
+    winStreak: ["comparison-win-streak", "Sua sequência atual foi maior que"],
+    maxStreak: ["comparison-max-streak", "Sua sequência máxima foi maior que"],
+  };
+
+  function renderComparisons(snapshot) {
+    const status = document.getElementById("stats-comparison-status");
+    const grid = document.getElementById("stats-comparison-metrics");
+    const comparisons = snapshot.data?.comparisons;
+    grid.hidden = true;
+    if (snapshot.status !== "ready") {
+      status.textContent = snapshot.status === "pending"
+        ? "Há resultados aguardando envio; as comparações serão atualizadas quando sincronizarem."
+        : "As comparações acumuladas estão indisponíveis. Seus totais locais continuam disponíveis.";
+      return;
+    }
+    if (!comparisons?.activePlayers) {
+      status.textContent = "Sem outros jogadores ativos para comparar ainda.";
+      return;
+    }
+
+    status.textContent = `Comparado com ${comparisons.activePlayers} ${comparisons.activePlayers === 1 ? "jogador ativo" : "jogadores ativos"} nos últimos 30 dias.`;
+    const noRate = comparisons.metrics.winRate.percentage === null;
+    for (const [metric, [id, description]] of Object.entries(comparisonDescriptions)) {
+      const element = document.getElementById(id);
+      const result = comparisons.metrics[metric];
+      element.textContent = result.percentage === null
+        ? "Conclua um jogo para comparar este indicador."
+        : `${description} ${result.percentage}% dos jogadores ativos.`;
+    }
+    if (noRate)
+      document.getElementById("comparison-win-rate").textContent =
+        "Conclua um jogo para comparar este indicador.";
+    grid.hidden = false;
+  }
+
   function renderHistory(history) {
     const list = document.getElementById("stats-history");
     if (!history.length) {
@@ -69,6 +108,7 @@
     const availability = document.getElementById("stats-availability");
     try {
       const snapshot = await window.BiblioResults.history(mode, challengeDay);
+      renderComparisons(snapshot);
       const data = snapshot.data || {};
       const stats = data.stats || {};
       const games = Number(stats.games) || 0;

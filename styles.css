@@ -835,6 +835,19 @@ th {
   gap: 12px;
   margin: 20px 0;
 }
+.statistics-comparisons {
+  margin: 28px 0;
+}
+.statistics-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.statistics-comparison-grid .statistics-card dd {
+  font-size: 15px;
+  line-height: 1.5;
+}
 .statistics-card {
   padding: 16px 12px;
   border: 1px solid var(--line);

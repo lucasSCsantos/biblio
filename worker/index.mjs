@@ -52,6 +52,9 @@ function baselineSnapshot(value) {
     safe.lastPlayedDay = validDay(raw?.lastPlayedDay)
       ? raw.lastPlayedDay
       : null;
+    if (safe.games === 0) safe.lastPlayedDay = null;
+    if (safe.wins === 0) safe.lastWinDay = null;
+    if (safe.games === 0) safe.winStreak = 0;
     snapshot[mode] = safe;
   }
   return snapshot;
@@ -86,9 +89,9 @@ async function stats(db, id, mode, day) {
         .filter((row) => row.score > own.score)
         .reduce((sum, row) => sum + row.count, 0)
     : 0;
-  const totals = await playerStats(db, id, mode, day);
+  const totals = await readPlayerStats(db, id, mode, day);
   return {
-    stats: totals.stats,
+    stats: totals,
     daily: {
       result: own
         ? { day: own.day, won: Boolean(own.won), attempts: own.attempts }
@@ -102,7 +105,37 @@ async function stats(db, id, mode, day) {
   };
 }
 
-async function playerStats(db, id, mode, asOfDay) {
+function dayDistance(left, right) {
+  return (
+    (Date.parse(`${right}T00:00:00Z`) - Date.parse(`${left}T00:00:00Z`)) /
+    86400000
+  );
+}
+
+function currentStreakAt(row, asOfDay) {
+  if (!row || !row.last_played_day) return 0;
+  const distance = dayDistance(row.last_played_day, asOfDay);
+  return distance < 0 || distance > 1
+    ? 0
+    : Number(row.current_streak) || 0;
+}
+
+async function readPlayerStats(db, id, mode, asOfDay) {
+  const row = await db
+    .prepare(
+      "SELECT games, wins, current_streak, max_streak, last_played_day FROM player_modes WHERE player_id = ? AND mode = ?",
+    )
+    .bind(id, mode)
+    .first();
+  return {
+    games: Number(row?.games) || 0,
+    wins: Number(row?.wins) || 0,
+    winStreak: currentStreakAt(row, asOfDay),
+    maxStreak: Number(row?.max_streak) || 0,
+  };
+}
+
+async function rebuildPlayerMode(db, id, mode, asOfDay) {
   const player = await db
     .prepare("SELECT baseline FROM players WHERE id = ?")
     .bind(id)
@@ -119,17 +152,22 @@ async function playerStats(db, id, mode, asOfDay) {
     )
     .bind(id, mode)
     .all();
+  const games = Number.isSafeInteger(imported.games) ? imported.games : 0;
+  const wins = Math.min(
+    games,
+    Number.isSafeInteger(imported.wins) ? imported.wins : 0,
+  );
   const base = {
-    games: Number.isSafeInteger(imported.games) ? imported.games : 0,
-    wins: Number.isSafeInteger(imported.wins) ? imported.wins : 0,
-    winStreak: Number.isSafeInteger(imported.winStreak)
+    games,
+    wins,
+    winStreak: games > 0 && wins > 0 && Number.isSafeInteger(imported.winStreak)
       ? imported.winStreak
       : 0,
     maxStreak: Number.isSafeInteger(imported.maxStreak)
       ? imported.maxStreak
       : 0,
-    lastWinDay: validDay(imported.lastWinDay) ? imported.lastWinDay : null,
-    lastPlayedDay: validDay(imported.lastPlayedDay)
+    lastWinDay: wins > 0 && validDay(imported.lastWinDay) ? imported.lastWinDay : null,
+    lastPlayedDay: games > 0 && validDay(imported.lastPlayedDay)
       ? imported.lastPlayedDay
       : null,
   };
@@ -163,19 +201,117 @@ async function playerStats(db, id, mode, asOfDay) {
   )
     current = 0;
 
-  return {
-    stats: {
-      games: base.games + history.results.length,
-      wins: base.wins + history.results.filter((result) => result.won).length,
-      winStreak: current,
+  const latestDay = history.results.at(-1)?.day || previousDay;
+  await db
+    .prepare(
+      "UPDATE player_modes SET games = ?, wins = ?, current_streak = ?, max_streak = ?, last_played_day = ? WHERE player_id = ? AND mode = ?",
+    )
+    .bind(
+      base.games + history.results.length,
+      base.wins + history.results.filter((result) => result.won).length,
+      current,
       maxStreak,
-    },
-    imported: base,
-    history: [...history.results].reverse().map((result) => ({
+      latestDay,
+      id,
+      mode,
+    )
+    .run();
+  return readPlayerStats(db, id, mode, asOfDay);
+}
+
+async function playerStats(db, id, mode, asOfDay, measureD1 = false) {
+  const [player, history, stats] = await Promise.all([
+    db.prepare("SELECT baseline FROM players WHERE id = ?").bind(id).first(),
+    db
+      .prepare(
+        "SELECT day, won, attempts FROM results WHERE player_id = ? AND mode = ? ORDER BY day DESC",
+      )
+      .bind(id, mode)
+      .all(),
+    readPlayerStats(db, id, mode, asOfDay),
+  ]);
+  let imported = {};
+  try {
+    imported = JSON.parse(player?.baseline)?.[mode] || {};
+  } catch {
+    imported = {};
+  }
+  return {
+    stats,
+    imported,
+    history: history.results.map((result) => ({
       day: result.day,
       won: Boolean(result.won),
       attempts: result.attempts,
     })),
+    comparisons: await accumulatedComparisons(
+      db,
+      id,
+      mode,
+      asOfDay,
+      stats,
+      measureD1,
+    ),
+  };
+}
+
+async function accumulatedComparisons(
+  db,
+  id,
+  mode,
+  asOfDay,
+  own,
+  measureD1,
+) {
+  const cutoff = new Date(
+    Date.parse(`${asOfDay}T00:00:00Z`) - 29 * 86400000,
+  )
+    .toISOString()
+    .slice(0, 10);
+  const peers = await db
+    .prepare(
+      `SELECT games, wins,
+        CASE WHEN current_streak > 0
+              AND julianday(?) - julianday(last_played_day) > 1
+          THEN 0 ELSE current_streak END AS current_streak,
+        max_streak
+       FROM player_modes INDEXED BY player_modes_active
+       WHERE mode = ? AND player_id <> ?
+         AND last_played_day >= ? AND last_played_day <= ?`,
+    )
+    .bind(asOfDay, mode, id, cutoff, asOfDay)
+    .all();
+  const rows = peers.results;
+  const activePlayers = rows.length;
+  const lower = (predicate) => rows.filter(predicate).length;
+  const percentage = (beaten) =>
+    activePlayers ? Math.floor((beaten * 100) / activePlayers) : null;
+  const rateAvailable = own.games > 0;
+  const beaten = {
+    games: lower((peer) => peer.games < own.games),
+    wins: lower((peer) => peer.wins < own.wins),
+    winRate: rateAvailable
+      ? lower(
+          (peer) => peer.wins * own.games < own.wins * peer.games,
+        )
+      : null,
+    winStreak: lower((peer) => peer.current_streak < own.winStreak),
+    maxStreak: lower((peer) => peer.max_streak < own.maxStreak),
+  };
+  return {
+    activePlayers,
+    metrics: Object.fromEntries(
+      Object.entries(beaten).map(([metric, count]) => [
+        metric,
+        {
+          beaten: count,
+          percentage: count === null ? null : percentage(count),
+        },
+      ]),
+    ),
+    ...(measureD1
+      ? { measuredD1: { cohortRowsRead: Number(peers.meta?.rows_read) || 0 } }
+      : {}),
   };
 }
 
@@ -229,7 +365,7 @@ export default {
         )
           return json({ error: "Resultado inválido" }, 400, cors);
         const score = result.won ? result.attempts : 7;
-        await env.DB.prepare(
+        const inserted = await env.DB.prepare(
           "INSERT INTO results(player_id, mode, day, won, attempts, score) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(player_id, mode, day) DO NOTHING",
         )
           .bind(
@@ -241,6 +377,16 @@ export default {
             score,
           )
           .run();
+        const updatedMode = await env.DB.prepare(
+          "SELECT last_played_day FROM player_modes WHERE player_id = ? AND mode = ?",
+        )
+          .bind(id, result.mode)
+          .first();
+        if (
+          inserted.meta?.changes > 0 &&
+          result.day < updatedMode.last_played_day
+        )
+          await rebuildPlayerMode(env.DB, id, result.mode, result.day);
         const accepted = await env.DB.prepare(
           "SELECT won, attempts FROM results WHERE player_id = ? AND mode = ? AND day = ?",
         )
@@ -255,11 +401,12 @@ export default {
             409,
             cors,
           );
-        return json(
-          await stats(env.DB, id, result.mode, result.day),
-          200,
-          cors,
-        );
+        const response = await stats(env.DB, id, result.mode, result.day);
+        if (env.MEASURE_D1)
+          response.measuredD1 = {
+            resultRowsWritten: Number(inserted.meta?.rows_written) || 0,
+          };
+        return json(response, 200, cors);
       }
       if (url.pathname === "/api/stats" && request.method === "GET") {
         const mode = url.searchParams.get("mode"),
@@ -273,7 +420,11 @@ export default {
         const day = url.searchParams.get("day");
         if (!modes.has(mode) || !validDay(day))
           return json({ error: "Consulta invÃ¡lida" }, 400, cors);
-        return json(await playerStats(env.DB, id, mode, day), 200, cors);
+        return json(
+          await playerStats(env.DB, id, mode, day, Boolean(env.MEASURE_D1)),
+          200,
+          cors,
+        );
       }
       return json({ error: "Recurso não encontrado" }, 404, cors);
     } catch (error) {

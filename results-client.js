@@ -100,6 +100,9 @@ window.BiblioResults = (() => {
       );
       baseline.lastPlayedDay = baseline.lastWinDay;
     }
+    if (baseline.games === 0) baseline.lastPlayedDay = null;
+    if (baseline.wins === 0) baseline.lastWinDay = null;
+    if (baseline.games === 0) baseline.winStreak = 0;
     return { baseline, result };
   }
 

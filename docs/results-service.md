@@ -29,6 +29,14 @@ Respostas inválidas usam 400; falta de identificação usa 401; origem não per
 
 A tabela `results` tem chave única por jogador, modo e dia. Um trigger `AFTER INSERT` atualiza o histograma `daily_counts` na mesma transação; uma duplicata não incrementa o contador. Cada comparação diária lê no máximo sete grupos de resultado, em vez de percorrer todos os jogadores.
 
+## Comparações acumuladas e consumo
+
+A tabela `player_modes` guarda um resumo materializado por jogador e modo: jogos, vitórias, sequência atual/máxima e último dia concluído. O índice `(mode, last_played_day, player_id)` seleciona somente os jogadores ativos no intervalo de 30 dias. Os cinco percentuais comparam os valores acumulados do histórico todo, excluindo o próprio jogador e resultados empatados. A taxa compara frações sem arredondar antes da comparação.
+
+O trigger atualiza resumo e totais na mesma gravação de `results`. Um resultado recebido fora de ordem reconstrói apenas o resumo daquele jogador/modo com seu histórico; consultas normais de Estatísticas não percorrem históricos dos demais jogadores. A migration `0002-player-modes.sql` reconstrói os resumos a partir do baseline e dos resultados já guardados, podendo ser reaplicada sem somar partidas duas vezes.
+
+Fixture browser real com 1 jogador consultante, 4 rivais ativos, 1 inativo, 1 jogador de outro modo e históricos/recentes conhecidos: o D1 local do Miniflare registrou **6 linhas lidas** na agregação indexada para retornar as quatro comparações e **7 linhas escritas** na inserção do resultado, incluindo atualizações auxiliares. Os contadores são `meta.rows_read` e `meta.rows_written`, medidos pelo D1 local; o campo `measuredD1` só aparece no runtime local de testes e não é enviado no Worker publicado. A migration de upgrade também é exercitada com `players` e `results` preexistentes e reaplicação do arquivo.
+
 ## Contrato do cliente e migração
 
 `window.BiblioResults` expõe:
