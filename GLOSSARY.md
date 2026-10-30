@@ -25,3 +25,9 @@ Jogos diários de descoberta de referências bíblicas e palavras de versículos
 **Sequência de vitórias**: quantidade de dias consecutivos em que um jogador venceu no mesmo modo. Uma derrota ou um dia sem jogar interrompe a sequência.
 
 **Jogador ativo**: jogador que concluiu pelo menos uma partida de um modo nos últimos 30 dias, considerado nas comparações acumuladas desse modo.
+
+**Resultado pendente**: conclusão já salva pelo jogador que ainda aguarda confirmação de recebimento pelo serviço de resultados.
+
+**Histórico importado**: totais anteriores de jogos concluídos, vitórias e sequências aceitos uma única vez como histórico informado pelo jogador, sem resultados antigos detalhados.
+
+**Comparação acumulada**: comparação de um indicador do histórico completo de um jogador com o mesmo indicador dos outros jogadores ativos daquele modo.
