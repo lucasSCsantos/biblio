@@ -110,7 +110,9 @@ export async function createSiteServer({
       let data = await fs.readFile(file);
       if (resource === "/site-config.js" && results)
         data = Buffer.from(
-          data.toString().replace('resultsApiUrl: ""', 'resultsApiUrl: "/api"'),
+          data
+            .toString()
+            .replace(/resultsApiUrl:\s*"[^"]*"/, 'resultsApiUrl: "/api"'),
         );
       response.writeHead(200, {
         "Content-Type": mime[path.extname(file)] || "application/octet-stream",

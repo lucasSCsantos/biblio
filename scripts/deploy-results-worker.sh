@@ -241,12 +241,12 @@ run_wizard() {
       warn "O valor não parece ser um UUID. O D1 existe, mas wrangler.jsonc não foi alterado."
       return 1
     fi
-    BIBLIO_D1_ID="$database_id" node -e 'const fs=require("fs");const p="wrangler.jsonc";const c=JSON.parse(fs.readFileSync(p,"utf8"));const db=c.d1_databases.find(x=>x.binding==="DB");if(!db||db.database_name!=="biblio-results")throw Error("Binding DB inesperado");db.database_id=process.env.BIBLIO_D1_ID;fs.writeFileSync(p,JSON.stringify(c,null,2)+"\n")'
-    say "ID salvo no binding DB de wrangler.jsonc."
   else
     say "Reutilizando o database_id já configurado em wrangler.jsonc: $database_id"
     pause "Confirme que esse banco pertence à conta Cloudflare autenticada."
   fi
+  BIBLIO_D1_ID="$database_id" node -e 'const fs=require("fs");const p="wrangler.jsonc";const c=JSON.parse(fs.readFileSync(p,"utf8"));const entries=c.d1_databases||[];const db=entries.find(x=>x.binding==="DB")||entries.find(x=>x.database_name==="biblio-results"&&x.database_id===process.env.BIBLIO_D1_ID);if(!db||db.database_name!=="biblio-results")throw Error("Binding D1 esperado não encontrado");db.binding="DB";db.database_id=process.env.BIBLIO_D1_ID;db.migrations_dir="worker/migrations";delete db.remote;c.d1_databases=[db,...entries.filter(x=>x!==db&&!(x.database_name==="biblio-results"&&x.database_id===process.env.BIBLIO_D1_ID))];fs.writeFileSync(p,JSON.stringify(c,null,2)+"\n")'
+  say "Binding DB salvo e entradas duplicadas do mesmo banco removidas de wrangler.jsonc."
   node -e 'const c=JSON.parse(require("fs").readFileSync("wrangler.jsonc","utf8"));if(c.vars?.ALLOWED_ORIGIN!=="https://bibliooo.com.br")throw Error("ALLOWED_ORIGIN deve ser https://bibliooo.com.br");console.log("Origem permitida conferida: "+c.vars.ALLOWED_ORIGIN)'
 
   stage "Aplicar migrações remotas"

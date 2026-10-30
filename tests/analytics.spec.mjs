@@ -145,8 +145,14 @@ test("opt-in mede ações de jogo e compartilhamento sem falsos inícios após r
   expect((await events(page)).filter((event) => event.name === "statistics_open"))
     .toHaveLength(1);
   await page.getByRole("link", { name: "Ver histórico completo" }).click();
-  expect((await events(page)).filter((event) => event.name === "statistics_open"))
-    .toHaveLength(2);
+  await expect(page).toHaveURL(/estatisticas\.html\?modo=palavra/);
+  await expect
+    .poll(
+      async () =>
+        (await events(page)).filter((event) => event.name === "statistics_open")
+          .length,
+    )
+    .toBe(2);
   await page.getByRole("link", { name: "Referência", exact: true }).click();
   expect((await events(page)).filter((event) => event.name === "mode_changed"))
     .toContainEqual(
