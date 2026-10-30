@@ -2,6 +2,12 @@
 
 O site é estático; as comparações usam um Cloudflare Worker separado e um banco D1. O serviço de resultados não depende do Google Analytics nem do consentimento de Analytics. A URL `resultsApiUrl` está vazia por padrão, então a integração só fica ativa depois de configurar essa URL e publicar novamente. Nenhum passo abaixo é executado pelo build local.
 
+## Wizard interativo
+
+No Windows, abra o Git Bash ou WSL na pasta do projeto e execute `bash scripts/deploy-results-worker.sh`. Em seis etapas, o wizard autentica o Wrangler, cria o D1 ou reutiliza o ID configurado, aplica migrações remotas, publica o Worker após confirmação, grava `resultsApiUrl` e gera o site. Ele não publica automaticamente os arquivos estáticos porque o provedor de hospedagem não está configurado neste repositório; publique-os pelo processo existente e faça a checagem final.
+
+O wizard pode instalar as dependências locais com `npm ci`. Antes de criar o D1, migrar ou publicar, pede confirmação. Não fornece nem salva token Cloudflare no projeto; a autenticação fica no Wrangler local. O plano pago não é ativado automaticamente.
+
 ## Preparar e publicar
 
 1. Instale e autentique o Wrangler na conta Cloudflare desejada.

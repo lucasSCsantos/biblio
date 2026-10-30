@@ -8,6 +8,8 @@ Os botões compactos abaixo do cabeçalho permitem alternar os modos. Uma aprese
 
 ## Desenvolvimento
 
+Para configurar o Worker e o D1 das comparações, rode `bash scripts/deploy-results-worker.sh` no Git Bash ou WSL. O wizard autentica o Wrangler, aplica as migrações, pede confirmação antes do deploy, configura a URL do Worker e gera o site. A publicação do site estático continua pelo provedor já usado pelo projeto.
+
 Requer Node.js 22 ou superior. `npm ci` instala ferramentas de desenvolvimento; o site publicado não depende de bibliotecas JavaScript externas para funcionar.
 
 ```sh
