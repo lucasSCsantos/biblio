@@ -21,8 +21,9 @@ Cada navegador gera 32 bytes aleatórios, persistidos como um token de 64 caract
 - `PUT /api/player`: recebe `{ baselines, capturedAt }`; cria a identidade uma vez. Cada modo tem um baseline com `games`, `wins`, `winStreak`, `maxStreak`, `lastWinDay` e `lastPlayedDay`. Valores inválidos são normalizados. Repetir a chamada não substitui o baseline salvo.
 - `POST /api/results`: recebe `{ mode, day, won, attempts }`. Modos: `referencia` ou `palavra`; dia: `YYYY-MM-DD`; tentativas: 1–6, obrigatoriamente 6 em derrota. O dia não pode anteceder o início do Biblio nem estar no futuro além da janela de fuso horário. A resposta contém as estatísticas individuais e a comparação diária.
 - `GET /api/stats?mode=palavra&day=YYYY-MM-DD`: leitura individual autenticada, sem listar outros jogadores.
+- `GET /api/history?mode=palavra&day=YYYY-MM-DD`: totais individuais, baseline importado e resultados detalhados desse modo em ordem decrescente de data. A resposta não inclui as tentativas digitadas.
 
-As respostas de resultado/consulta têm `{ stats, daily }`. `daily` contém `result` (ou `null`), `otherPlayers`, `beaten`, `percentage` (ou `null`) e `first`. O próprio jogador fica fora do denominador. Empates não contam como resultados superados. O percentual é inteiro, arredondado para baixo.
+As respostas de resultado/consulta têm `{ stats, daily }`. `daily` contém `result` (ou `null`), `otherPlayers`, `beaten`, `percentage` (ou `null`) e `first`. O próprio jogador fica fora do denominador. Empates não contam como resultados superados. O percentual é inteiro, arredondado para baixo. `stats` soma o baseline aceito uma única vez aos resultados detalhados posteriores. A sequência é recalculada em ordem de data e volta a zero após derrota, lacuna ou quando já não está vigente na data consultada.
 
 Respostas inválidas usam 400; falta de identificação usa 401; origem não permitida usa 403; identidade inexistente usa 404; conclusão diferente já registrada para o mesmo modo/dia usa 409. O serviço aceita reenvio idêntico sem criar nova linha.
 
@@ -44,7 +45,7 @@ O registro `biblio-results-v1` no localStorage contém versão, token, `baseline
 
 Ao adotar a coleta, o cliente captura o baseline dos dois modos. Se a última conclusão ainda estiver recuperável no estado antigo, subtrai seus jogos/vitórias do baseline e coloca esse resultado na fila, evitando somá-lo duas vezes na importação. A sequência anterior é preservada até onde o estado agregado permite inferir. Detalhes antigos inexistentes não são reconstruídos.
 
-Neste primeiro ticket, o Worker guarda o baseline, mas `stats` soma somente resultados detalhados novos. A interpretação completa dos totais importados e das sequências pertence ao ticket 02. O contrato da comparação diária já é definitivo; o ticket 03 acrescentará as comparações acumuladas à resposta.
+A página `estatisticas.html` permite alternar entre os modos, consultar jogos, vitórias, taxa e sequências, e ver resultados detalhados recebidos. Os totais antigos são preservados, mas os seus detalhes não podem ser reconstruídos. Se o serviço estiver indisponível, a página mostra os totais locais e ajusta a sequência pela data atual sem inventar resultados coletivos. O ticket 03 acrescentará as comparações acumuladas à resposta.
 
 ## Configuração de produção
 

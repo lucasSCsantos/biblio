@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estatísticas | Biblio</title>
+  <meta name="description" content="Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.">
+  <meta property="og:title" content="Estatísticas | Biblio">
+  <meta property="og:description" content="Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bibliooo.com.br/estatisticas.html">
+  <meta name="google-adsense-account" content="ca-pub-4020170826821314">
+  <link rel="canonical" href="https://bibliooo.com.br/estatisticas.html">
+  <link rel="icon" href="images/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site-config.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="results-client.js" defer></script>
+  <script src="statistics.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><a class="brand" href="index.html" aria-label="Biblio, página inicial">BIBLIO</a>
+    <nav aria-label="Navegação principal"><a href="index.html">Jogar</a><a href="estatisticas.html" aria-current="page">Estatísticas</a><a href="como-jogar.html">Como jogar</a><a href="guias.html">Guias</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></nav>
+  </header>
+  <div class="page-shell"><section id="privacy-choices" class="privacy-panel" aria-labelledby="privacy-title" hidden>
+  <div><p class="eyebrow">Você escolhe</p><h2 id="privacy-title" tabindex="-1">Sua privacidade, suas preferências</h2>
+  <p>O progresso do jogo fica neste navegador. Análise de uso e publicidade são opcionais e só carregam com sua permissão. Você pode jogar sem aceitar.</p>
+  <p><a href="privacidade.html">Leia a política de privacidade</a>. Altere sua escolha a qualquer momento pelo rodapé.</p></div>
+  <div class="privacy-controls"><label><input id="allow-analytics" type="checkbox"> Permitir análise de uso (Google Analytics)</label>
+  <label><input id="allow-advertising" type="checkbox"> Permitir publicidade (Google AdSense, quando disponível)</label>
+  <div class="button-row"><button id="privacy-reject" type="button">Recusar opcionais</button><button id="privacy-save" type="button">Salvar escolhas</button></div>
+  <p id="privacy-status" role="status"></p></div>
+</section>
+  <main id="conteudo" class="article"><section class="article statistics-page" aria-labelledby="statistics-title">
+  <p class="eyebrow">Seu progresso</p>
+  <h1 id="statistics-title">Estatísticas</h1>
+  <p>Seu histórico e suas sequências são separados por modo.</p>
+
+  <nav class="statistics-modes" aria-label="Escolher modo das estatísticas">
+    <a href="estatisticas.html" data-stats-mode="referencia">Referência</a>
+    <a href="estatisticas.html?modo=palavra" data-stats-mode="palavra"
+      >Palavra</a
+    >
+  </nav>
+  <h2 id="stats-mode-title">Referência</h2>
+  <p
+    id="stats-availability"
+    class="statistics-status"
+    role="status"
+    aria-live="polite"
+  ></p>
+
+  <dl class="statistics-grid" aria-label="Resumo do modo selecionado">
+    <div class="statistics-card">
+      <dt>Jogos concluídos</dt>
+      <dd id="stats-games">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Vitórias</dt>
+      <dd id="stats-wins">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Taxa de vitória</dt>
+      <dd id="stats-win-rate">0%</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Sequência atual</dt>
+      <dd id="stats-current-streak">0</dd>
+    </div>
+    <div class="statistics-card">
+      <dt>Sequência máxima</dt>
+      <dd id="stats-max-streak">0</dd>
+    </div>
+  </dl>
+
+  <p id="stats-imported" class="statistics-import" hidden></p>
+  <section aria-labelledby="stats-history-title">
+    <h2 id="stats-history-title">Resultados detalhados</h2>
+    <p class="statistics-history-note">
+      Os resultados antigos que já não têm detalhes continuam incluídos nos
+      totais importados.
+    </p>
+    <ol id="stats-history" class="statistics-history"></ol>
+  </section>
+  <a id="back-to-game" class="text-link" href="index.html"
+    >Voltar ao desafio <span aria-hidden="true">→</span></a
+  >
+</section>
+</main>
+  </div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
+    <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
+    <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
+  </footer>
+</body>
+</html>

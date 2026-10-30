@@ -8,6 +8,12 @@ const pages = [
     "Jogar",
   ],
   [
+    "estatisticas.html",
+    "Estatísticas | Biblio",
+    "Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.",
+    "Estatísticas",
+  ],
+  [
     "como-jogar.html",
     "Como jogar Biblio",
     "Aprenda a jogar os modos Referência e Palavra do Biblio: seis tentativas, pistas por cores e dois desafios diários.",
@@ -52,6 +58,7 @@ const pages = [
 ];
 const nav = [
   ["index.html", "Jogar"],
+  ["estatisticas.html", "Estatísticas"],
   ["como-jogar.html", "Como jogar"],
   ["guias.html", "Guias"],
   ["sobre.html", "Sobre"],
@@ -107,7 +114,7 @@ for (const [file, title, description, active] of pages) {
   <link rel="stylesheet" href="styles.css">
   <script src="site-config.js" defer></script>
   <script src="site.js" defer></script>
-${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="mode-intro.js" defer></script>\n  <script src="results-client.js" defer></script>\n  <script src="script.js" defer></script>' : ""}
+${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="mode-intro.js" defer></script>\n  <script src="results-client.js" defer></script>\n  <script src="script.js" defer></script>' : file === "estatisticas.html" ? '  <script src="results-client.js" defer></script>\n  <script src="statistics.js" defer></script>' : ""}
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
