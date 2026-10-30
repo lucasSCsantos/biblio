@@ -798,6 +798,10 @@ th {
 .modal-container > p {
   color: white;
 }
+.modal-container .daily-comparison {
+  margin: 12px 0;
+  font-size: 14px;
+}
 .modal-footer button {
   background: var(--colorButton);
   color: #24170c;

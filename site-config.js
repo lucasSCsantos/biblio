@@ -4,4 +4,7 @@ window.BIBLIO_CONFIG = Object.freeze({
   publisherId: "ca-pub-4020170826821314",
   adSlot: "",
   adsEnabled: false,
+  // URL do serviço publicado, por exemplo https://biblio-results.sua-conta.workers.dev/api.
+  // Vazio mantém o site independente até configurar o serviço. O servidor local usa /api.
+  resultsApiUrl: "",
 });

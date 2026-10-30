@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, baseline TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS results (player_id TEXT NOT NULL REFERENCES players(id), mode TEXT NOT NULL CHECK(mode IN ('referencia','palavra')), day TEXT NOT NULL, won INTEGER NOT NULL CHECK(won IN (0,1)), attempts INTEGER NOT NULL CHECK(attempts BETWEEN 1 AND 6), score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 7), created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(player_id, mode, day));
+CREATE INDEX IF NOT EXISTS results_mode_day ON results(mode, day, score);
+CREATE TABLE IF NOT EXISTS daily_counts (mode TEXT NOT NULL, day TEXT NOT NULL, score INTEGER NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(mode, day, score));
+CREATE TRIGGER IF NOT EXISTS count_result AFTER INSERT ON results BEGIN INSERT INTO daily_counts(mode, day, score, count) VALUES(NEW.mode, NEW.day, NEW.score, 1) ON CONFLICT(mode, day, score) DO UPDATE SET count = count + 1; END;

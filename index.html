@@ -18,6 +18,7 @@
   <script src="bible-index.js" defer></script>
   <script src="word-game.js" defer></script>
   <script src="mode-intro.js" defer></script>
+  <script src="results-client.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -199,6 +200,12 @@
     </button>
     <h2 id="stats-title">Meu progresso</h2>
     <div class="modal-header"><h3 class="modal-title"></h3></div>
+    <p
+      id="daily-comparison"
+      class="daily-comparison"
+      role="status"
+      aria-live="polite"
+    ></p>
     <div class="modal-body">
       <div class="stats">
         <div class="stat" id="games">
