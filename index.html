@@ -1,188 +1,249 @@
 <!DOCTYPE html>
-<html lang="pt-br" translate="no">
+<html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Um jogo diário para desafiar seu conhecimento bíblico!">
-	<meta property="og:title" content="Biblio" />
-	<meta property="og:description" content="Um jogo diário para desafiar seu conhecimento bíblico!" />
-	<meta http-equiv="Content-Language" content="pt-br">
-	<title>Biblio</title>
-	<link rel="stylesheet" href="styles.css">
-	<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-	<link rel="canonical" href="https://bibliooo.com.br/">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblio — desafio bíblico diário</title>
+  <meta name="description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
+  <meta property="og:title" content="Biblio — desafio bíblico diário">
+  <meta property="og:description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bibliooo.com.br/">
+  <meta name="google-adsense-account" content="ca-pub-4020170826821314">
+  <link rel="canonical" href="https://bibliooo.com.br/">
+  <link rel="icon" href="images/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site-config.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="bible-index.js" defer></script>
+  <script src="word-game.js" defer></script>
+  <script src="mode-intro.js" defer></script>
+  <script src="results-client.js" defer></script>
+  <script src="script.js" defer></script>
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
 		crossorigin="anonymous"></script>
 </head>
 <body>
-	<div id="help-modal" class="hidden" onclick="hideHelpModal()">
-		<div class="help-modal-container">
-			<p id="help-container-title">
-				Você tem 6 chances para descobrir o versículo do dia!
-				Descubra o livro, capítulo e o número do versículo para acertar.
-			</p>
-			<p>
-				Para o livro você deve acertar a sigla e para o capítulo e versículo sempre usar 2 dígitos:
-			</p>
-			<div class="help-section">
-				<div class="box">M</div>
-				<div class="box">C</div>
-				<div class="space"></div>
-				<div class="box">0</div>
-				<div class="box">3</div>
-				<div class="colon">:</div>
-				<div class="box">2</div>
-				<div class="box">1</div>
-			</div>
-			<p>
-				Caso você acerte uma letra ou número no lugar certo, este aparecerá em verde.
-			</p>
-			<div class="help-section">
-				<div class="box right">M</div>
-				<div class="box">C</div>
-				<div class="space"></div>
-				<div class="box">0</div>
-				<div class="box right">3</div>
-				<div class="colon">:</div>
-				<div class="box">2</div>
-				<div class="box">1</div>
-			</div>
-			<p>
-				Caso você acerte uma letra ou número no lugar errado, este aparecerá em amarelo.
-			</p>
-			<div class="help-section">
-				<div class="box right">M</div>
-				<div class="box">C</div>
-				<div class="space"></div>
-				<div class="box parcial">0</div>
-				<div class="box right">3</div>
-				<div class="colon">:</div>
-				<div class="box">2</div>
-				<div class="box parcial">1</div>
-			</div>
-			<p>
-				Para os números e letras que não fazem parte do versículo, estes aparecerão em cinza.
-			</p>
-			<div class="help-section">
-				<div class="box right">M</div>
-				<div class="box wrong">C</div>
-				<div class="space"></div>
-				<div class="box parcial">0</div>
-				<div class="box right">3</div>
-				<div class="colon">:</div>
-				<div class="box wrong">2</div>
-				<div class="box parcial">1</div>
-			</div>
-			<p>
-				Até você acertar toda a referencia!
-				<br/>
-				(Ou então perder 😬)
-			</p>
-			<div class="help-section">
-				<div class="box right">M</div>
-				<div class="box right">T</div>
-				<div class="space"></div>
-				<div class="box right">1</div>
-				<div class="box right">3</div>
-				<div class="colon">:</div>
-				<div class="box right">0</div>
-				<div class="box right">4</div>
-			</div>
-		</div>
-	</div>
-	<!-- <div id="settings-modal" class="hidden">
-		<div class="settings-modal-container">
-		</div>
-	</div> -->
-	<div id="info-modal" class="hidden" onclick="hideInfoModal()">
-		<div class="info-modal-container">
-			<h3 id="info-container-title">Sobre o Biblio</h3>
-			<p>
-				O biblio foi criado como uma alternativa ao <a href="https://www.nytimes.com/games/wordle/index.html" target="_blank">Wordle</a>.
-			</p>
-			<p>
-				Todo dia uma nova chance de testar seu conhecimento bíblico e também descobrir mais sobre as escrituras.
-			</p>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><a class="brand" href="index.html" aria-label="Biblio, página inicial">BIBLIO</a>
+    <nav aria-label="Navegação principal"><a href="index.html" aria-current="page">Jogar</a><a href="estatisticas.html">Estatísticas</a><a href="como-jogar.html">Como jogar</a><a href="guias.html">Guias</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></nav>
+  </header>
+  <nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
+  <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
+  <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
+</div></nav>
+  <div class="page-shell"><section id="privacy-choices" class="privacy-panel" aria-labelledby="privacy-title" hidden>
+  <div><p class="eyebrow">Você escolhe</p><h2 id="privacy-title" tabindex="-1">Sua privacidade, suas preferências</h2>
+  <p>Seu progresso fica neste navegador. Resultados concluídos podem alimentar as comparações do jogo. Analytics e publicidade são opcionais e só carregam com sua permissão.</p>
+  <p><a href="privacidade.html">Leia a política de privacidade</a>. Altere sua escolha a qualquer momento pelo rodapé.</p></div>
+  <div class="privacy-controls"><label><input id="allow-analytics" type="checkbox"> Permitir análise de uso (Google Analytics)</label>
+  <label><input id="allow-advertising" type="checkbox"> Permitir publicidade (Google AdSense, quando disponível)</label>
+  <div class="button-row"><button id="privacy-reject" type="button">Recusar opcionais</button><button id="privacy-save" type="button">Salvar escolhas</button></div>
+  <p id="privacy-status" role="status"></p></div>
+</section>
+  <main id="conteudo" class="home-content"><h1 class="sr-only">Biblio: desafio bíblico diário</h1>
+<section class="game-panel" aria-label="Desafio bíblico diário">
+  <div class="game-toolbar">
+    <span class="daily-label"
+      ><span aria-hidden="true">●</span> Desafio do dia</span
+    >
+    <div>
+      <a href="como-jogar.html">Como jogar</a
+      ><button type="button" id="stats" disabled onclick="showStatsModal('manual')">
+        Meu progresso
+      </button>
+    </div>
+  </div>
+  <div id="game" aria-label="Tabuleiro e teclado">
+    <p>Carregando o desafio…</p>
+  </div>
+  <noscript
+    ><p>
+      Ative o JavaScript para jogar. Você também pode consultar as
+      <a href="como-jogar.html">regras</a> e os
+      <a href="guias.html">guias de leitura</a>.
+    </p></noscript
+  >
+  <p
+    id="game-feedback"
+    class="game-feedback"
+    role="status"
+    aria-live="polite"
+  ></p>
+  <p class="game-note">
+    Use duas letras + capítulo e versículo com dois dígitos. Exemplo:
+    <strong>MC 03:21</strong>.<br />Tradução: Bíblia Livre ·
+    <a href="como-jogar.html#livros">Veja as siglas disponíveis</a>
+  </p>
+</section>
+<aside class="ad-space" data-ad-space aria-label="Publicidade" hidden>
+  <p>Publicidade</p>
+</aside>
+<section class="intro-section">
+  <p class="eyebrow">Um pouco de memória. Um pouco de lógica.</p>
+  <h2>A passagem é a pista.<br />Escolha seu desafio.</h2>
+  <p>
+    No Biblio, você tem dois jogos por dia. Em Referência, descubra o livro,
+    capítulo e versículo. Em Palavra, a referência já aparece e você completa
+    uma palavra de cinco letras que falta na passagem. São seis tentativas em
+    cada jogo, com cores que ajudam a encontrar a resposta.
+  </p>
+  <p>
+    Você não precisa conhecer todas as referências de memória: compare as
+    pistas, ajuste sua hipótese e experimente. Ao terminar, volte à passagem e
+    leia os versículos ao redor. A descoberta continua depois da partida.
+  </p>
+  <a class="text-link" href="como-jogar.html"
+    >Conheça as regras <span aria-hidden="true">→</span></a
+  >
+</section>
+<section class="guides-section" aria-labelledby="guides-title">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Para além do tabuleiro</p>
+      <h2 id="guides-title">Leia, descubra, aprenda.</h2>
+    </div>
+    <a href="guias.html">Todos os guias →</a>
+  </div>
+  <div class="cards">
+    <a class="guide-card" href="referencias-biblicas.html"
+      ><span class="card-number">01 / Leitura</span>
+      <h3>Livro, capítulo e versículo</h3>
+      <p>
+        Entenda como uma referência funciona e por que ler o contexto faz
+        diferença.
+      </p>
+      <span class="text-link">Entender as referências →</span></a
+    ><a class="guide-card" href="estrategias.html"
+      ><span class="card-number">02 / Estratégia</span>
+      <h3>Transforme as cores em pistas</h3>
+      <p>Use o contexto e as cores para descobrir referências e palavras.</p>
+      <span class="text-link">Explorar as pistas →</span></a
+    >
+  </div>
+</section>
+<section class="faq">
+  <h2>Antes da próxima tentativa</h2>
+  <details>
+    <summary>Todo mundo recebe o mesmo desafio?</summary>
+    <p>
+      Sim, cada modo tem o mesmo desafio para quem está na mesma data local. Os
+      dois modos usam referências diferentes entre si. O desafio muda à
+      meia-noite do seu dispositivo. Pessoas em fusos diferentes podem estar em
+      dias diferentes.
+    </p>
+  </details>
+  <details>
+    <summary>Preciso criar uma conta?</summary>
+    <p>
+      Não. Suas tentativas e estatísticas ficam neste navegador. Se você apagar
+      os dados do site ou trocar de dispositivo, o histórico não acompanha você.
+      Cada modo tem sua própria partida e estatísticas: jogar um não consome as
+      tentativas do outro.
+    </p>
+  </details>
+  <details>
+    <summary>Por que a frase pode ser diferente da minha Bíblia?</summary>
+    <p>
+      Usamos a Bíblia Livre, edição Textus Receptus de fevereiro de 2018. As
+      traduções podem usar palavras diferentes para a mesma passagem. Veja os
+      <a href="sobre.html#traducao">créditos da tradução</a>.
+    </p>
+  </details>
+</section>
+</main>
+  </div>
+<dialog
+  id="mode-intro"
+  class="mode-intro"
+  aria-labelledby="mode-intro-title"
+  aria-describedby="mode-intro-description"
+>
+  <button
+    class="close-dialog"
+    type="button"
+    data-dismiss-intro
+    aria-label="Fechar apresentação"
+  >
+    ×
+  </button>
+  <p class="eyebrow">Novo no Biblio</p>
+  <h2 id="mode-intro-title">Temos um novo modo!</h2>
+  <p id="mode-intro-description">
+    Conheça <strong>Palavra</strong>: a referência já aparece e você descobre a
+    palavra de cinco letras que falta no versículo.
+  </p>
+  <p>
+    São seis tentativas, com pistas por cores. Jogue Referência e Palavra todos
+    os dias, com progressos separados.
+  </p>
+  <div class="intro-actions">
+    <a class="button" href="index.html?modo=palavra" data-try-word
+      >Jogar Palavra</a
+    >
+    <button type="button" data-dismiss-intro autofocus>Continuar</button>
+  </div>
+</dialog>
+<div
+  id="modal"
+  class="game-dialog hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="stats-title"
+>
+  <div class="modal-container">
+    <button
+      class="close-dialog"
+      type="button"
+      data-close-dialog
+      aria-label="Fechar progresso"
+    >
+      ×
+    </button>
+    <h2 id="stats-title">Meu progresso</h2>
+    <div class="modal-header"><h3 class="modal-title"></h3></div>
+    <p
+      id="daily-comparison"
+      class="daily-comparison"
+      role="status"
+      aria-live="polite"
+    ></p>
+    <div class="modal-body">
+      <div class="stats">
+        <div class="stat" id="games">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Total de jogos</span>
+        </div>
+        <div class="stat" id="percentage">
+          <strong class="stat-number">0%</strong
+          ><span class="stat-name">Vitórias</span>
+        </div>
+        <div class="stat" id="streak">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Sequência atual</span>
+        </div>
+        <div class="stat" id="max-streak">
+          <strong class="stat-number">0</strong
+          ><span class="stat-name">Sequência máxima</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" id="share-button">Compartilhar resultado</button>
+      <a id="full-statistics" href="estatisticas.html"
+        >Ver histórico completo</a
+      >
+    </div>
+    <p>
+      Seu progresso fica salvo neste navegador. Resultados concluídos alimentam
+      as comparações, mesmo com o Analytics desativado.
+    </p>
+  </div>
+</div>
 
-			<p>
-				Inspirado por <a href="https://term.ooo" target="_blank">Termo</a>.
-			</p>
-			<br/>
-			<h3 id="info-container-title">Termo de Privacidade</h3>
-			<p>
-				Este jogo não coleta dados pessoais diretamente. Utilizamos o Google Analytics para entender como os usuários
-				interagem com o jogo. Essas informações são anônimas e agregadas.
-			</p>
-			<p>
-				Não utilizamos cookies, só registramos localmente as suas estatísticas de forma anônima.
-			</p>
-			<p>
-				Para mais informações sobre como o Google Analytics coleta e processa dados, consulte a <a
-					href="https://policies.google.com/privacy" target="_blank">Política de Privacidade do Google</a>.
-			</p>
-		</div>
-	</div>
-	<div id="modal" class="hidden">
-		<div class="modal-container">
-			<div class="modal-header">
-				<h3 class="modal-title">
-				</h3>
-			</div>
-			<div class="modal-body">
-				<h3>PROGRESSO</h3>
-				<div class="stats">
-					<div class="stat" id="games">
-						<h2 class="stat-number"></h2>
-						<span class="stat-name"></span>
-					</div>
-					<div class="stat" id="percentage">
-						<h2 class="stat-number"></h2>
-						<span class="stat-name"></span>
-					</div>
-					<div class="stat" id="streak">
-						<h2 class="stat-number"></h2>
-						<span class="stat-name"></span>
-					</div>
-					<div class="stat" id="max-streak">
-						<h2 class="stat-number"></h2>
-						<span class="stat-name"></span>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button id="share-button">Compartilhe!</button>
-			</div>
-		</div>
-	</div>
-	<header>
-			<h1>BIBLIO</h1>
-			<div id="icons">
-				<button id="help" onclick="showHelpModal()">
-					<i class="fa-solid fa-circle-question"></i>
-				</button>
-				<button id="stats" onclick="showStatsModal()">
-					<i class="fa-solid fa-square-poll-horizontal"></i>
-				</button>
-				<!-- <button id="settings" onclick="showSettingsModal()">
-					<i class="fa-solid fa-gear"></i>
-				</button> -->
-				<button id="info" onclick="showInfoModal()">
-					<i class="fa-solid fa-circle-info"></i>
-				</button>
-			</div>
-	</header>
-	<main id="game">
-	</main>
-	<script src="script.js"></script>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GZR46LQ80C"></script>
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
-		crossorigin="anonymous"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-GZR46LQ80C');
-	</script>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
+    <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
+    <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
+  </footer>
+</body>
 </html>
