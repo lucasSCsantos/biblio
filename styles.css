@@ -977,6 +977,13 @@ th {
   .box.active {
     border-width: 3px;
   }
+  .hard-grid {
+    --hard-box-size: min(2.8rem, calc((100vw - 96px) / 7));
+  }
+  .hard-grid .box {
+    width: var(--hard-box-size);
+    height: var(--hard-box-size);
+  }
   .box.space {
     margin-right: 16px;
   }

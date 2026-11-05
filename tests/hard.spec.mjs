@@ -104,6 +104,19 @@ test("Hard pula a casa opcional ao começar por letra e avalia a casa vazia", as
   await expect(page.locator(".grid .right")).toHaveCount(7);
 });
 
+test("o tabuleiro Hard cabe em celulares estreitos", async ({ page }) => {
+  await referenceGame(page, "1sm", "hard");
+  for (const width of [375, 361, 360, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    const grid = await page.locator(".grid").boundingBox();
+    expect(grid.x).toBeGreaterThanOrEqual(0);
+    expect(grid.x + grid.width).toBeLessThanOrEqual(width);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+});
+
 for (const book of ["1sm", "2sm"]) {
   test(`normal sorteia ${book} e aceita SM sem numeral`, async ({ page }) => {
     await referenceGame(page, book);
