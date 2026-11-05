@@ -1,4 +1,4 @@
-const modes = new Set(["referencia", "palavra"]);
+const modes = new Set(["referencia", "palavra", "hard"]);
 
 function json(data, status = 200, headers = {}) {
   return Response.json(data, {

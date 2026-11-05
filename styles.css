@@ -213,6 +213,9 @@ p {
 .word-grid {
   grid-template-columns: repeat(5, auto);
 }
+.hard-grid {
+  grid-template-columns: repeat(8, auto);
+}
 .game-modes {
   margin: 0 0 6px;
 }

@@ -10,6 +10,8 @@ O wizard pode instalar as dependências locais com `npm ci`. Antes de criar o D1
 
 ## Preparar e publicar
 
+O modo Hard exige a migração `0003-hard-mode.sql` e o Worker atualizado antes de publicar o novo site. A migração preserva os resultados, os agregados diários e os históricos anteriores, e acrescenta Hard como modo separado.
+
 1. Instale e autentique o Wrangler na conta Cloudflare desejada.
 2. Crie a base: `npx wrangler d1 create biblio-results`.
 3. Copie o `database_id` retornado para `wrangler.jsonc`. Confirme que `database_name` é `biblio-results` e que `ALLOWED_ORIGIN` contém a origem HTTPS exata do site.

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
+import { buildBibleIndex } from "./build-bible-index.mjs";
 
 // Fonte: pacote porbr2018_vpl.zip de eBible.org; veja licenses/BIBLIA-LIVRE.md.
 const input = process.argv[2];
@@ -98,19 +99,7 @@ for (const book of corpus) {
     throw new Error(`Livro incompleto: ${book.name}`);
 }
 fs.writeFileSync("bible.json", JSON.stringify(corpus) + "\n");
-const eligible = corpus.filter((b) => b.abbrev.length === 2);
-const counts = Object.fromEntries(
-  eligible.map((b) => [
-    b.abbrev,
-    b.chapters.flatMap((c, i) =>
-      i < 99 ? [{ chapter: i + 1, versicles: Math.min(c.length, 99) }] : [],
-    ),
-  ]),
-);
-fs.writeFileSync(
-  "bible-index.js",
-  `// Gerado por scripts/import-bible.mjs a partir da Bíblia Livre.\nconst bible = ${JSON.stringify(counts)};\n`,
-);
+buildBibleIndex(corpus);
 console.log(
   `Importados ${corpus.length} livros, ${corpus.reduce((n, b) => n + b.chapters.reduce((s, c) => s + c.length, 0), 0)} versículos. SHA-256 VPL: ${crypto.createHash("sha256").update(raw).digest("hex")}`,
 );

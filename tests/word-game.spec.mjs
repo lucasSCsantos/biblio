@@ -40,8 +40,40 @@ test("o jogador escolhe Palavra e recebe um tabuleiro de cinco letras", async ({
   });
 });
 
+test("o sorteio Palavra inclui respostas comuns acrescentadas à seleção", async ({
+  page,
+}) => {
+  await page.route("**/bible-index.js", (route) =>
+    route.fulfill({
+      contentType: "text/javascript",
+      body: "const bible = {at: [{chapter: 1, versicles: 1}]};",
+    }),
+  );
+  await page.route("**/bible.json", (route) =>
+    route.fulfill({
+      json: [
+        { abbrev: "at", name: "Atos", chapters: [["Uma passagem."]] },
+        { abbrev: "gn", name: "Gênesis", chapters: [["O homem."]] },
+      ],
+    }),
+  );
+  await page.goto("/?modo=palavra");
+  await page.getByRole("button", { name: "Recusar opcionais" }).click();
+  await expect(page.locator(".versicle h2")).toHaveText("“O _____.”");
+  await page.locator("#game").click({ position: { x: 5, y: 5 } });
+  await page.keyboard.type("HOMEM");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
+});
+
 // Corpus pequeno para exercitar repetições e acentos com resposta conhecida.
 async function knownChallenge(page) {
+  await page.route("**/bible-index.js", (route) =>
+    route.fulfill({
+      contentType: "text/javascript",
+      body: "const bible = {at: [{chapter: 4, versicles: 37}]};",
+    }),
+  );
   await page.route("**/bible.json", (route) =>
     route.fulfill({
       json: [

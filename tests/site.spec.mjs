@@ -56,9 +56,11 @@ test("o servidor não entrega arquivos privados por separadores do Windows", asy
 
 test("Jó e João têm siglas distintas nas regras", async ({ page }) => {
   await page.goto("/como-jogar.html");
-  await expect(page.getByRole("cell", { name: "JO", exact: true })).toHaveCount(
-    1,
-  );
+  await expect(
+    page.getByRole("row").filter({
+      has: page.getByRole("cell", { name: "João", exact: true }),
+    }),
+  ).toContainText("JO");
   await expect(
     page
       .getByRole("row")
@@ -97,6 +99,13 @@ test("o desafio de Atos abre e permite enviar uma tentativa", async ({
       route.fulfill({ body: original, contentType: "text/javascript" }),
     );
   }
+  if (!baseline)
+    await page.route("**/bible-index.js", (route) =>
+      route.fulfill({
+        contentType: "text/javascript",
+        body: "const bible = {at: [{chapter: 4, versicles: 37}]};",
+      }),
+    );
   // Datas com sorteio de Atos nas respectivas versões do índice.
   await page.clock.install({
     time: new Date(baseline ? "2026-10-13T12:00:00" : "2026-10-31T12:00:00"),
@@ -244,10 +253,11 @@ test("o snippet do AdSense espera consentimento mesmo sem ID de bloco manual", a
 
 test("páginas públicas e navegação funcionam sem JavaScript", async ({
   browser,
+  baseURL,
 }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4173/");
+  await page.goto(`${baseURL}/`);
   await page
     .getByRole("navigation", { name: "Navegação principal" })
     .getByRole("link", { name: "Como jogar" })
@@ -269,7 +279,7 @@ test("páginas públicas e navegação funcionam sem JavaScript", async ({
     ["contato.html", "Contato"],
     ["privacidade.html", "Política de privacidade"],
   ]) {
-    await page.goto(`http://127.0.0.1:4173/${file}`);
+    await page.goto(`${baseURL}/${file}`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
     await expect(
       page.getByRole("navigation", { name: "Informações do site" }),

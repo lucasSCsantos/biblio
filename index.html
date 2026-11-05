@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Biblio — desafio bíblico diário</title>
-  <meta name="description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
+  <meta name="description" content="Três modos bíblicos diários: Referência, Hard e Palavra. Descubra a resposta em seis tentativas. Gratuito e sem cadastro.">
   <meta property="og:title" content="Biblio — desafio bíblico diário">
-  <meta property="og:description" content="Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.">
+  <meta property="og:description" content="Três modos bíblicos diários: Referência, Hard e Palavra. Descubra a resposta em seis tentativas. Gratuito e sem cadastro.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bibliooo.com.br/">
   <meta name="google-adsense-account" content="ca-pub-4020170826821314">
@@ -21,8 +21,6 @@
   <script src="mode-intro.js" defer></script>
   <script src="results-client.js" defer></script>
   <script src="script.js" defer></script>
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020170826821314"
-		crossorigin="anonymous"></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -31,6 +29,7 @@
   </header>
   <nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
   <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
+  <a href="index.html?modo=hard" data-game-mode="hard">Hard</a>
   <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
 </div></nav>
   <div class="page-shell"><section id="privacy-choices" class="privacy-panel" aria-labelledby="privacy-title" hidden>
@@ -50,7 +49,12 @@
     >
     <div>
       <a href="como-jogar.html">Como jogar</a
-      ><button type="button" id="stats" disabled onclick="showStatsModal('manual')">
+      ><button
+        type="button"
+        id="stats"
+        disabled
+        onclick="showStatsModal('manual')"
+      >
         Meu progresso
       </button>
     </div>
@@ -84,10 +88,11 @@
   <p class="eyebrow">Um pouco de memória. Um pouco de lógica.</p>
   <h2>A passagem é a pista.<br />Escolha seu desafio.</h2>
   <p>
-    No Biblio, você tem dois jogos por dia. Em Referência, descubra o livro,
-    capítulo e versículo. Em Palavra, a referência já aparece e você completa
-    uma palavra de cinco letras que falta na passagem. São seis tentativas em
-    cada jogo, com cores que ajudam a encontrar a resposta.
+    No Biblio, você tem três modos por dia. Em Referência, descubra o livro,
+    capítulo e versículo. No Hard, inclua também o numeral do livro, quando
+    houver. Em Palavra, a referência já aparece e você completa uma palavra de
+    cinco letras que falta na passagem. São seis tentativas em cada jogo, com
+    cores que ajudam a encontrar a resposta.
   </p>
   <p>
     Você não precisa conhecer todas as referências de memória: compare as
@@ -129,9 +134,9 @@
     <summary>Todo mundo recebe o mesmo desafio?</summary>
     <p>
       Sim, cada modo tem o mesmo desafio para quem está na mesma data local. Os
-      dois modos usam referências diferentes entre si. O desafio muda à
-      meia-noite do seu dispositivo. Pessoas em fusos diferentes podem estar em
-      dias diferentes.
+      modos Referência e Hard usam a mesma passagem; Palavra usa outra. O
+      desafio muda à meia-noite do seu dispositivo. Pessoas em fusos diferentes
+      podem estar em dias diferentes.
     </p>
   </details>
   <details>
@@ -175,8 +180,8 @@
     palavra de cinco letras que falta no versículo.
   </p>
   <p>
-    São seis tentativas, com pistas por cores. Jogue Referência e Palavra todos
-    os dias, com progressos separados.
+    São seis tentativas, com pistas por cores. Jogue Referência, Hard e Palavra
+    todos os dias, com progressos separados.
   </p>
   <div class="intro-actions">
     <a class="button" href="index.html?modo=palavra" data-try-word
@@ -242,7 +247,7 @@
   </div>
 </div>
 
-  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e desafios bíblicos a cada dia.</p></div>
     <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
     <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
   </footer>

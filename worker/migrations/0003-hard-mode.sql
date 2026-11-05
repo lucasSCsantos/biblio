@@ -1,0 +1,18 @@
+DROP TRIGGER IF EXISTS count_result;
+DROP TRIGGER IF EXISTS update_player_mode_after_result;
+DROP TRIGGER IF EXISTS initialize_player_modes;
+CREATE TABLE results_with_hard (player_id TEXT NOT NULL REFERENCES players(id), mode TEXT NOT NULL CHECK(mode IN ('referencia','palavra','hard')), day TEXT NOT NULL, won INTEGER NOT NULL CHECK(won IN (0,1)), attempts INTEGER NOT NULL CHECK(attempts BETWEEN 1 AND 6), score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 7), created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(player_id, mode, day));
+INSERT INTO results_with_hard SELECT * FROM results;
+DROP TABLE results;
+ALTER TABLE results_with_hard RENAME TO results;
+CREATE INDEX results_mode_day ON results(mode, day, score);
+CREATE TABLE player_modes_with_hard (player_id TEXT NOT NULL REFERENCES players(id), mode TEXT NOT NULL CHECK(mode IN ('referencia','palavra','hard')), games INTEGER NOT NULL DEFAULT 0 CHECK(games >= 0), wins INTEGER NOT NULL DEFAULT 0 CHECK(wins >= 0), current_streak INTEGER NOT NULL DEFAULT 0 CHECK(current_streak >= 0), max_streak INTEGER NOT NULL DEFAULT 0 CHECK(max_streak >= 0), last_played_day TEXT, PRIMARY KEY(player_id, mode));
+INSERT INTO player_modes_with_hard SELECT * FROM player_modes;
+DROP TABLE player_modes;
+ALTER TABLE player_modes_with_hard RENAME TO player_modes;
+CREATE INDEX player_modes_active ON player_modes(mode, last_played_day, player_id);
+INSERT OR IGNORE INTO player_modes(player_id, mode) SELECT id, 'hard' FROM players;
+CREATE TRIGGER count_result AFTER INSERT ON results BEGIN INSERT INTO daily_counts(mode, day, score, count) VALUES(NEW.mode, NEW.day, NEW.score, 1) ON CONFLICT(mode, day, score) DO UPDATE SET count = count + 1; END;
+CREATE TRIGGER update_player_mode_after_result AFTER INSERT ON results BEGIN UPDATE player_modes SET games = games + 1, wins = wins + NEW.won, current_streak = CASE WHEN NEW.day <= COALESCE(last_played_day, '') THEN current_streak WHEN NEW.won = 0 THEN 0 WHEN last_played_day = date(NEW.day, '-1 day') THEN current_streak + 1 ELSE 1 END, max_streak = MAX(max_streak, CASE WHEN NEW.day <= COALESCE(last_played_day, '') THEN current_streak WHEN NEW.won = 0 THEN 0 WHEN last_played_day = date(NEW.day, '-1 day') THEN current_streak + 1 ELSE 1 END), last_played_day = MAX(COALESCE(last_played_day, ''), NEW.day) WHERE player_id = NEW.player_id AND mode = NEW.mode; END;
+
+CREATE TRIGGER IF NOT EXISTS initialize_player_modes AFTER INSERT ON players BEGIN INSERT OR IGNORE INTO player_modes (player_id, mode, games, wins, current_streak, max_streak, last_played_day) VALUES (NEW.id, 'referencia', COALESCE(json_extract(NEW.baseline, '$.referencia.games'), 0), COALESCE(json_extract(NEW.baseline, '$.referencia.wins'), 0), COALESCE(json_extract(NEW.baseline, '$.referencia.winStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.referencia.maxStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.referencia.lastPlayedDay'), json_extract(NEW.baseline, '$.referencia.lastWinDay'))), (NEW.id, 'palavra', COALESCE(json_extract(NEW.baseline, '$.palavra.games'), 0), COALESCE(json_extract(NEW.baseline, '$.palavra.wins'), 0), COALESCE(json_extract(NEW.baseline, '$.palavra.winStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.palavra.maxStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.palavra.lastPlayedDay'), json_extract(NEW.baseline, '$.palavra.lastWinDay'))), (NEW.id, 'hard', COALESCE(json_extract(NEW.baseline, '$.hard.games'), 0), COALESCE(json_extract(NEW.baseline, '$.hard.wins'), 0), COALESCE(json_extract(NEW.baseline, '$.hard.winStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.hard.maxStreak'), 0), COALESCE(json_extract(NEW.baseline, '$.hard.lastPlayedDay'), json_extract(NEW.baseline, '$.hard.lastWinDay'))); END;

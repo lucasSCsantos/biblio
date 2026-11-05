@@ -4,19 +4,19 @@ const pages = [
   [
     "index.html",
     "Biblio — desafio bíblico diário",
-    "Dois jogos bíblicos diários: descubra a referência ou a palavra que falta no versículo em seis tentativas. Gratuito e sem cadastro.",
+    "Três modos bíblicos diários: Referência, Hard e Palavra. Descubra a resposta em seis tentativas. Gratuito e sem cadastro.",
     "Jogar",
   ],
   [
     "estatisticas.html",
     "Estatísticas | Biblio",
-    "Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.",
+    "Consulte seu histórico, vitórias e sequências nos modos Referência, Hard e Palavra.",
     "Estatísticas",
   ],
   [
     "como-jogar.html",
     "Como jogar Biblio",
-    "Aprenda a jogar os modos Referência e Palavra do Biblio: seis tentativas, pistas por cores e dois desafios diários.",
+    "Aprenda a jogar os modos Referência, Hard e Palavra do Biblio: seis tentativas e pistas por cores.",
     "Como jogar",
   ],
   [
@@ -65,11 +65,10 @@ const nav = [
   ["contato.html", "Contato"],
 ];
 const bible = JSON.parse(fs.readFileSync("bible.json", "utf8"));
-const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros disponíveis no modo Referência</caption><thead><tr><th scope="col">Sigla</th><th scope="col">Livro</th></tr></thead><tbody>${bible
-  .filter((b) => b.abbrev.length === 2)
+const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros nos modos Referência e Hard</caption><thead><tr><th scope="col">Normal</th><th scope="col">Hard</th><th scope="col">Livro</th></tr></thead><tbody>${bible
   .map(
     (b) =>
-      `<tr><td>${b.abbrev
+      `<tr><td>${b.abbrev.replace(/^\d/, "").toUpperCase()}</td><td>${b.abbrev
         .toUpperCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")}</td><td>${b.name}</td></tr>`,
@@ -86,6 +85,7 @@ const privacy = `<section id="privacy-choices" class="privacy-panel" aria-labell
 </section>`;
 const gameModes = `<nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
   <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
+  <a href="index.html?modo=hard" data-game-mode="hard">Hard</a>
   <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
 </div></nav>`;
 for (const [file, title, description, active] of pages) {
@@ -125,7 +125,7 @@ ${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-ga
 ${home ? `  ${gameModes}\n` : ""}  <div class="page-shell">${privacy}
   <main id="conteudo"${home ? ' class="home-content"' : ' class="article"'}>${body}</main>
   </div>${dialog}
-  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e desafios bíblicos a cada dia.</p></div>
     <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
     <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
   </footer>

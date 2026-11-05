@@ -1,10 +1,18 @@
-const wordMode = new URLSearchParams(location.search).get("modo") === "palavra";
+const requestedMode = new URLSearchParams(location.search).get("modo");
+const gameMode = ["palavra", "hard"].includes(requestedMode)
+  ? requestedMode
+  : "referencia";
+const wordMode = gameMode === "palavra";
+const hardMode = gameMode === "hard";
+const modeTitle = wordMode ? "Palavra" : hardMode ? "Hard" : "Referência";
 const storage = wordMode
   ? { state: "biblio-palavra-state", stats: "biblio-palavra-stats" }
-  : { state: "state", stats: "stats" };
+  : hardMode
+    ? { state: "biblio-hard-state", stats: "biblio-hard-stats" }
+    : { state: "state", stats: "stats" };
 const global = {
   chances: 6,
-  boxes: wordMode ? 5 : 6,
+  boxes: wordMode ? 5 : hardMode ? 7 : 6,
 };
 
 let revealing = false;
@@ -56,11 +64,11 @@ async function startUp() {
   try {
     window.BiblioResults?.initialize();
     document.querySelectorAll("[data-game-mode]").forEach((link) => {
-      if ((link.dataset.gameMode === "palavra") === wordMode)
+      if (link.dataset.gameMode === gameMode)
         link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
       link.addEventListener("click", () => {
-        const fromMode = wordMode ? "palavra" : "referencia";
+        const fromMode = gameMode;
         const toMode = link.dataset.gameMode;
         if (fromMode !== toMode)
           window.biblioTrack?.(
@@ -71,7 +79,12 @@ async function startUp() {
       });
     });
     document.getElementById("stats-title").textContent =
-      `Meu progresso · ${wordMode ? "Palavra" : "Referência"}`;
+      `Meu progresso · ${modeTitle}`;
+    if (hardMode) {
+      document.querySelector(".game-note").textContent =
+        "Descubra a referência, incluindo o numeral do livro. Comece por 1, 2 ou 3; em livros sem numeral, comece pelas letras. Tradução: Bíblia Livre.";
+      document.querySelector(".game-toolbar a").href = "como-jogar.html#hard";
+    }
     if (wordMode) {
       document.querySelector(".game-note").textContent =
         "Descubra a palavra de cinco letras. Acentos e cedilha são equivalentes às letras sem acento. Tradução: Bíblia Livre.";
@@ -87,12 +100,21 @@ async function startUp() {
         `${getUserDate().toISOString().slice(0, 10)}:palavra-v1`,
       );
       const challenge = await wordGame.challenge(reference, hash);
-      for (const [key, value] of Object.entries(challenge))
-        updateState(key, value);
-      updateState("answer", `${challenge.answerWord} — ${challenge.reference}`);
-      drawPassage(main, challenge.maskedVersicle, challenge.reference);
+      // A lista pode crescer sem trocar a resposta de uma partida já iniciada.
+      const saved = getState();
+      if (!saved.maskedVersicle || !saved.secret) {
+        for (const [key, value] of Object.entries(challenge))
+          updateState(key, value);
+        updateState(
+          "answer",
+          `${challenge.answerWord} — ${challenge.reference}`,
+        );
+      }
+      const current = getState();
+      drawPassage(main, current.maskedVersicle, current.reference);
     } else {
-      setSecret(book, chapter, verse);
+      if (!getState().secret || !getState().versicle)
+        setSecret(book, chapter, verse);
       await drawVersicle(main, book, chapter, verse);
     }
     drawGrid(main, global.chances, global.boxes);
@@ -308,7 +330,7 @@ function keyboardEvent() {
 
     if (
       isLetter(normalizedKey) &&
-      currentColumn < (wordMode ? global.boxes : 2)
+      currentColumn < (wordMode ? global.boxes : hardMode ? 3 : 2)
     ) {
       addLetter(normalizedKey);
     }
@@ -316,7 +338,8 @@ function keyboardEvent() {
     if (
       isNumber(event.key) &&
       !wordMode &&
-      currentColumn >= 2 &&
+      (currentColumn >= (hardMode ? 3 : 2) ||
+        (hardMode && currentColumn === 0 && /^[123]$/.test(event.key))) &&
       currentColumn < global.boxes
     ) {
       addLetter(event.key);
@@ -339,15 +362,16 @@ function drawGrid(container, chances, boxes) {
 
   grid.className = "grid";
   if (wordMode) grid.classList.add("word-grid");
+  if (hardMode) grid.classList.add("hard-grid");
 
   for (let i = 0; i < chances; i++) {
     for (let j = 0; j < boxes; j++) {
       const box = drawBox(i, j);
 
-      if (!wordMode && j === 1) {
+      if (!wordMode && j === (hardMode ? 2 : 1)) {
         box.classList.add("space");
       }
-      if (!wordMode && j === 4) {
+      if (!wordMode && j === (hardMode ? 5 : 4)) {
         const colon = document.createElement("p");
         colon.className = "colon";
         colon.textContent = ":";
@@ -365,14 +389,16 @@ function drawBox(row, column) {
   const box = document.createElement(`div`);
   const letter = grid[row][column];
   const colors = guessColors(grid[row], secret);
+  const completedRow =
+    row < currentRow || ((won || gameOver) && row === currentRow);
 
   box.className = "box";
   box.id = `box${row}${column}`;
 
-  if (letter) {
+  if (letter || (hardMode && column === 0 && completedRow)) {
     box.textContent = letter;
 
-    if (row < currentRow || won || gameOver) box.classList.add(colors[column]);
+    if (completedRow) box.classList.add(colors[column]);
   }
 
   if (!won && !gameOver && row === currentRow && column === currentColumn) {
@@ -461,15 +487,18 @@ function keyboardClick(key) {
 }
 
 function addLetter(letter) {
-  const { currentColumn, currentRow, grid } = getState();
+  let { currentColumn, currentRow, grid } = getState();
 
   trackGameStarted();
+
+  if (hardMode && currentColumn === 0 && /^[a-z]$/i.test(letter))
+    currentColumn = 1;
 
   grid[currentRow][currentColumn] = letter.toUpperCase();
 
   updateState("grid", grid);
 
-  if (currentColumn < global.boxes) updateCurrentColumn();
+  if (currentColumn < global.boxes) updateCurrentColumn(currentColumn + 1);
 }
 
 function onEnter() {
@@ -490,7 +519,7 @@ function onEnter() {
     return;
   }
 
-  if (!validateBook(word) || word.join("").length !== global.boxes) {
+  if (!validateBook(word) || !word.slice(hardMode ? 1 : 0).every(Boolean)) {
     cleanRow();
   } else {
     revealWord(word);
@@ -629,7 +658,7 @@ function updateStats() {
   }
   const createdStats = JSON.parse(localStorage.getItem(storage.stats));
   window.BiblioResults?.record({
-    mode: wordMode ? "palavra" : "referencia",
+    mode: gameMode,
     day: completed.challengeDay || getUserDate().toISOString().slice(0, 10),
     won: completed.won,
     attempts: completed.currentRow + 1,
@@ -652,7 +681,7 @@ function renderDailyComparison() {
     return;
   }
   const view = window.BiblioResults?.snapshot(
-    wordMode ? "palavra" : "referencia",
+    gameMode,
     state.challengeDay || getUserDate().toISOString().slice(0, 10),
   );
   if (view?.status === "ready" && view.data.daily?.result) {
@@ -753,12 +782,12 @@ function cleanRow() {
 
 function validateBook(word) {
   const books = Object.keys(bible).map((abbrv) =>
-    abbrv
+    (hardMode ? abbrv : abbrv.replace(/^\d/, ""))
       .toUpperCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, ""),
   );
-  const book = word.slice(0, 2).join("");
+  const book = word.slice(0, hardMode ? 3 : 2).join("");
   return books.includes(book);
 }
 
@@ -766,8 +795,15 @@ function removeLetter() {
   const { grid, currentColumn, currentRow } = getState();
 
   if (currentColumn === 0) return;
-  updateCurrentColumn(currentColumn - 1);
-  grid[currentRow][currentColumn - 1] = "";
+  let previousColumn = currentColumn - 1;
+  while (previousColumn > 0 && !grid[currentRow][previousColumn])
+    previousColumn--;
+  grid[currentRow][previousColumn] = "";
+  updateCurrentColumn(
+    hardMode && previousColumn === 1 && !grid[currentRow][0]
+      ? 0
+      : previousColumn,
+  );
   updateState("grid", grid);
 }
 
@@ -816,14 +852,17 @@ async function createShareContent() {
     url: "",
   };
 
-  let shareText = `Joguei bibliooo.com.br · ${wordMode ? "Palavra" : "Referência"} #${currentGame} 🔥${stats.winStreak}\n\n`;
+  let shareText = `Joguei bibliooo.com.br · ${modeTitle} #${currentGame} 🔥${stats.winStreak}\n\n`;
 
   for (let i = 0; i < global.chances; i += 1) {
     let linUsed = false;
     for (let j = 0; j < global.boxes; j += 1) {
       const box = document.getElementById(`box${i}${j}`);
 
-      if (box && box.textContent) {
+      if (
+        box &&
+        (box.textContent || (hardMode && j === 0 && i <= state.currentRow))
+      ) {
         linUsed = true;
         const classList = box.classList;
         let square;
@@ -845,6 +884,7 @@ async function createShareContent() {
 
   shareText += `\n"${wordMode ? getState().maskedVersicle : versicle}" — BLIVRE\n`;
   if (wordMode) shareText += "https://bibliooo.com.br/?modo=palavra\n";
+  if (hardMode) shareText += "https://bibliooo.com.br/?modo=hard\n";
 
   shareData.text = shareText;
 
@@ -928,14 +968,17 @@ function setSecret(book, chapter, verse) {
   let answer = "";
 
   answer += book
-    .slice(0, 2)
+    .replace(/^\d/, "")
     .toUpperCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
   answer += chapter.toString().length === 2 ? chapter : "0" + chapter;
   answer += verse.toString().length === 2 ? verse : "0" + verse;
 
-  updateState("secret", answer.split(""));
+  updateState(
+    "secret",
+    hardMode ? [book.match(/^\d/)?.[0] || "", ...answer] : answer.split(""),
+  );
 }
 
 function showStatsModal(source = "automatic") {
@@ -953,9 +996,10 @@ function showStatsModal(source = "automatic") {
   const modalHeader = document.getElementsByClassName("modal-title")[0];
   const statDiv = document.querySelectorAll(".stat");
   const button = document.getElementById("share-button");
-  document.getElementById("full-statistics").href = wordMode
-    ? "estatisticas.html?modo=palavra"
-    : "estatisticas.html";
+  document.getElementById("full-statistics").href =
+    gameMode === "referencia"
+      ? "estatisticas.html"
+      : `estatisticas.html?modo=${gameMode}`;
 
   const played = state.won || state.gameOver;
 
@@ -991,7 +1035,7 @@ function showStatsModal(source = "automatic") {
   modal.querySelector("[data-close-dialog]").focus();
   renderDailyComparison();
   window.BiblioResults?.refresh(
-    wordMode ? "palavra" : "referencia",
+    gameMode,
     state.challengeDay || getUserDate().toISOString().slice(0, 10),
   );
 }
@@ -1006,7 +1050,7 @@ function getUserDate() {
 function analyticsContext(extra = {}) {
   const state = getState();
   return {
-    mode: wordMode ? "palavra" : "referencia",
+    mode: gameMode,
     challenge_day:
       state.challengeDay || getUserDate().toISOString().slice(0, 10),
     challenge_number: state.currentGame,

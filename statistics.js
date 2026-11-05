@@ -1,7 +1,11 @@
 (() => {
   const params = new URLSearchParams(location.search);
-  const mode = params.get("modo") === "palavra" ? "palavra" : "referencia";
-  const title = mode === "palavra" ? "Palavra" : "Referência";
+  const requestedMode = params.get("modo");
+  const mode = ["palavra", "hard"].includes(requestedMode)
+    ? requestedMode
+    : "referencia";
+  const title =
+    mode === "palavra" ? "Palavra" : mode === "hard" ? "Hard" : "Referência";
   const today = new Date();
   const challengeDay = new Date(
     today.getTime() - today.getTimezoneOffset() * 60000,
@@ -30,7 +34,7 @@
     });
   });
   document.getElementById("back-to-game").href =
-    mode === "palavra" ? "index.html?modo=palavra" : "index.html";
+    mode === "referencia" ? "index.html" : `index.html?modo=${mode}`;
 
   const percent = (wins, games) =>
     games
@@ -51,9 +55,10 @@
     const comparisons = snapshot.data?.comparisons;
     grid.hidden = true;
     if (snapshot.status !== "ready") {
-      status.textContent = snapshot.status === "pending"
-        ? "Há resultados aguardando envio; as comparações serão atualizadas quando sincronizarem."
-        : "As comparações acumuladas estão indisponíveis. Seus totais locais continuam disponíveis.";
+      status.textContent =
+        snapshot.status === "pending"
+          ? "Há resultados aguardando envio; as comparações serão atualizadas quando sincronizarem."
+          : "As comparações acumuladas estão indisponíveis. Seus totais locais continuam disponíveis.";
       return;
     }
     if (!comparisons?.activePlayers) {
@@ -63,12 +68,15 @@
 
     status.textContent = `Comparado com ${comparisons.activePlayers} ${comparisons.activePlayers === 1 ? "jogador ativo" : "jogadores ativos"} nos últimos 30 dias.`;
     const noRate = comparisons.metrics.winRate.percentage === null;
-    for (const [metric, [id, description]] of Object.entries(comparisonDescriptions)) {
+    for (const [metric, [id, description]] of Object.entries(
+      comparisonDescriptions,
+    )) {
       const element = document.getElementById(id);
       const result = comparisons.metrics[metric];
-      element.textContent = result.percentage === null
-        ? "Conclua um jogo para comparar este indicador."
-        : `${description} ${result.percentage}% dos jogadores ativos.`;
+      element.textContent =
+        result.percentage === null
+          ? "Conclua um jogo para comparar este indicador."
+          : `${description} ${result.percentage}% dos jogadores ativos.`;
     }
     if (noRate)
       document.getElementById("comparison-win-rate").textContent =

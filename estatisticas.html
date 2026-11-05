@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Estatísticas | Biblio</title>
-  <meta name="description" content="Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.">
+  <meta name="description" content="Consulte seu histórico, vitórias e sequências nos modos Referência, Hard e Palavra.">
   <meta property="og:title" content="Estatísticas | Biblio">
-  <meta property="og:description" content="Consulte seu histórico, vitórias e sequências nos modos Referência e Palavra.">
+  <meta property="og:description" content="Consulte seu histórico, vitórias e sequências nos modos Referência, Hard e Palavra.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bibliooo.com.br/estatisticas.html">
   <meta name="google-adsense-account" content="ca-pub-4020170826821314">
@@ -40,6 +40,7 @@
 
   <nav class="statistics-modes" aria-label="Escolher modo das estatísticas">
     <a href="estatisticas.html" data-stats-mode="referencia">Referência</a>
+    <a href="estatisticas.html?modo=hard" data-stats-mode="hard">Hard</a>
     <a href="estatisticas.html?modo=palavra" data-stats-mode="palavra"
       >Palavra</a
     >
@@ -75,15 +76,38 @@
     </div>
   </dl>
 
-  <section class="statistics-comparisons" aria-labelledby="stats-comparisons-title">
+  <section
+    class="statistics-comparisons"
+    aria-labelledby="stats-comparisons-title"
+  >
     <h2 id="stats-comparisons-title">Comparações acumuladas</h2>
-    <p id="stats-comparison-status" class="statistics-status" role="status" aria-live="polite"></p>
+    <p
+      id="stats-comparison-status"
+      class="statistics-status"
+      role="status"
+      aria-live="polite"
+    ></p>
     <dl id="stats-comparison-metrics" class="statistics-comparison-grid" hidden>
-      <div class="statistics-card"><dt>Jogos concluídos</dt><dd id="comparison-games"></dd></div>
-      <div class="statistics-card"><dt>Vitórias</dt><dd id="comparison-wins"></dd></div>
-      <div class="statistics-card"><dt>Taxa de vitórias</dt><dd id="comparison-win-rate"></dd></div>
-      <div class="statistics-card"><dt>Sequência atual</dt><dd id="comparison-win-streak"></dd></div>
-      <div class="statistics-card"><dt>Sequência máxima</dt><dd id="comparison-max-streak"></dd></div>
+      <div class="statistics-card">
+        <dt>Jogos concluídos</dt>
+        <dd id="comparison-games"></dd>
+      </div>
+      <div class="statistics-card">
+        <dt>Vitórias</dt>
+        <dd id="comparison-wins"></dd>
+      </div>
+      <div class="statistics-card">
+        <dt>Taxa de vitórias</dt>
+        <dd id="comparison-win-rate"></dd>
+      </div>
+      <div class="statistics-card">
+        <dt>Sequência atual</dt>
+        <dd id="comparison-win-streak"></dd>
+      </div>
+      <div class="statistics-card">
+        <dt>Sequência máxima</dt>
+        <dd id="comparison-max-streak"></dd>
+      </div>
     </dl>
   </section>
 
@@ -102,7 +126,7 @@
 </section>
 </main>
   </div>
-  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e dois desafios bíblicos a cada dia.</p></div>
+  <footer class="site-footer"><div><a class="footer-brand" href="index.html">Biblio</a><p>Memória, descoberta e desafios bíblicos a cada dia.</p></div>
     <nav aria-label="Informações do site"><a href="sobre.html">Sobre e créditos</a><a href="contato.html">Contato</a><a href="privacidade.html">Privacidade</a><button type="button" data-privacy-settings>Preferências de cookies</button></nav>
     <p class="attribution">Textos bíblicos: <a href="https://sites.google.com/site/biblialivre/">Bíblia Livre (BLIVRE)</a>, fevereiro de 2018. © Diego Santos, Mario Sérgio e Marco Teles. Distribuição eBible sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Conversão para JSON pelo Biblio. <a href="sobre.html#traducao">Fonte e licença</a>.</p>
   </footer>

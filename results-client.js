@@ -4,6 +4,7 @@ window.BiblioResults = (() => {
   const modeKeys = {
     referencia: ["stats", "state"],
     palavra: ["biblio-palavra-stats", "biblio-palavra-state"],
+    hard: ["biblio-hard-stats", "biblio-hard-state"],
   };
   const views = new Map();
   let running;
