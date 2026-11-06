@@ -8,13 +8,13 @@ Jogos diários de descoberta de referências bíblicas e palavras de versículos
 
 **Modo Referência**: jogo em que o texto do versículo é a pista para descobrir sua referência bíblica.
 
-**Modo Hard**: variante do modo Referência em que a resposta também distingue o numeral dos livros numerados. Livros sem numeral deixam a primeira casa vazia.
+**Modo Difícil**: variante do modo Referência em que a resposta também distingue o numeral dos livros numerados. Livros sem numeral deixam a primeira casa vazia.
 
 **Modo Palavra**: jogo em que o texto do versículo e sua referência são as pistas para descobrir uma palavra de cinco letras, oculta em todas as suas ocorrências.
 
 **Referência bíblica**: identificação de um versículo pelo livro, capítulo e número do versículo.
 
-**Tentativa**: resposta proposta pelo jogador: uma referência com sigla de duas letras e dois dígitos para capítulo e versículo no modo Referência, acrescida do numeral do livro quando houver no modo Hard, ou uma palavra de cinco letras no modo Palavra. No modo Referência, o numeral do livro é desconsiderado.
+**Tentativa**: resposta proposta pelo jogador: uma referência com sigla de duas letras e dois dígitos para capítulo e versículo no modo Referência, acrescida do numeral do livro quando houver no modo Difícil, ou uma palavra de cinco letras no modo Palavra. No modo Referência, o numeral do livro é desconsiderado.
 
 **Bíblia Livre**: tradução usada nos desafios, com atribuição aos autores e permissão de redistribuição comercial.
 

@@ -17,6 +17,27 @@ test.beforeEach(async ({ page }) => {
   await page.route(/^https:\/\//, (route) => route.abort());
 });
 
+test("Difícil sorteia outra referência e mantém o desafio ao recarregar", async ({ page }) => {
+  await page.route("**/bible-index.js", route => route.fulfill({
+    contentType: "text/javascript", body: "const bible = {jo: [{chapter: 1, versicles: 2}]};",
+  }));
+  await page.route("**/bible.json", route => route.fulfill({ json: [{
+    abbrev: "jo", name: "João", chapters: [["Primeira passagem.", "Segunda passagem."]],
+  }] }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Recusar opcionais" }).click();
+  await expect(page.locator("#game[data-ready=true]")).toBeVisible();
+  const normal = await page.locator(".versicle h2").textContent();
+  await page.getByRole("link", { name: "Difícil", exact: true }).click();
+  await expect(page.locator("#game[data-ready=true]")).toBeVisible();
+  await expect(page.locator(".versicle h2")).not.toHaveText(normal);
+  const difficult = await page.locator(".versicle h2").textContent();
+  await page.reload();
+  await expect(page.locator(".versicle h2")).toHaveText(difficult);
+  await page.getByRole("link", { name: "Referência", exact: true }).click();
+  await expect(page.locator(".versicle h2")).toHaveText(normal);
+});
+
 async function referenceGame(page, book, mode = "") {
   await page.route("**/bible-index.js", (route) =>
     route.fulfill({
@@ -41,13 +62,13 @@ async function referenceGame(page, book, mode = "") {
   await page.locator("#game").click({ position: { x: 5, y: 5 } });
 }
 
-test("Hard aceita numeral, permite apagar e preserva a partida ao trocar de modo", async ({
+test("Difícil aceita numeral, permite apagar e preserva a partida ao trocar de modo", async ({
   page,
 }, testInfo) => {
   await referenceGame(page, "1sm", "hard");
   await expect(page.locator(".grid .box")).toHaveCount(42);
   await expect(
-    page.getByRole("link", { name: "Hard", exact: true }),
+    page.getByRole("link", { name: "Difícil", exact: true }),
   ).toHaveAttribute("aria-current", "page");
   await page.keyboard.type("2S");
   await page.keyboard.press("Backspace");
@@ -57,7 +78,7 @@ test("Hard aceita numeral, permite apagar e preserva a partida ao trocar de modo
   await page.getByRole("link", { name: "Referência", exact: true }).click();
   await expect(page.locator(".grid .box")).toHaveCount(36);
   await expect(page.locator("#box00")).toBeEmpty();
-  await page.getByRole("link", { name: "Hard", exact: true }).click();
+  await page.getByRole("link", { name: "Difícil", exact: true }).click();
   await expect(page.locator("#box00")).toHaveText("1");
   for (const selector of [".grid", ".keyboard", ".game-modes"]) {
     const box = await page.locator(selector).boundingBox();
@@ -73,18 +94,18 @@ test("Hard aceita numeral, permite apagar e preserva a partida ao trocar de modo
   await page.locator("#game").click({ position: { x: 5, y: 5 } });
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.locator("#stats-title")).toContainText("Hard");
+  await expect(page.locator("#stats-title")).toContainText("Difícil");
   await page.getByRole("button", { name: "Fechar progresso" }).click();
   await expect(page.locator("#tag")).toHaveText("1 Samuel 1:1");
   await expect(page.locator(".grid .right")).toHaveCount(7);
   await page.reload();
   await expect(page.locator(".grid .right")).toHaveCount(7);
   await page.getByRole("link", { name: "Ver histórico completo" }).click();
-  await expect(page.locator("#stats-mode-title")).toHaveText("Hard");
+  await expect(page.locator("#stats-mode-title")).toHaveText("Difícil");
   await expect(page.locator("#stats-games")).toHaveText("1");
 });
 
-test("Hard pula a casa opcional ao começar por letra e avalia a casa vazia", async ({
+test("Difícil pula a casa opcional ao começar por letra e avalia a casa vazia", async ({
   page,
 }) => {
   await referenceGame(page, "jo", "hard");
@@ -104,7 +125,7 @@ test("Hard pula a casa opcional ao começar por letra e avalia a casa vazia", as
   await expect(page.locator(".grid .right")).toHaveCount(7);
 });
 
-test("o tabuleiro Hard cabe em celulares estreitos", async ({ page }) => {
+test("o tabuleiro Difícil cabe em celulares estreitos", async ({ page }) => {
   await referenceGame(page, "1sm", "hard");
   for (const width of [375, 361, 360, 320]) {
     await page.setViewportSize({ width, height: 800 });
@@ -129,7 +150,7 @@ for (const book of ["1sm", "2sm"]) {
   });
 }
 
-test("a API mantém resultados e histórico Hard separados do normal", async ({
+test("a API mantém resultados e histórico Difícil separados do normal", async ({
   request,
   service,
 }) => {
@@ -161,7 +182,7 @@ test("a API mantém resultados e histórico Hard separados do normal", async ({
   }
 });
 
-test("a migração conserva histórico e comparação normal e permite jogar Hard", async ({
+test("a migração conserva histórico e comparação normal e permite jogar Difícil", async ({
   request,
 }) => {
   const token = "b".repeat(64);

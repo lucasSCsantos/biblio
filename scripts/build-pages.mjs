@@ -4,19 +4,19 @@ const pages = [
   [
     "index.html",
     "Biblio — desafio bíblico diário",
-    "Três modos bíblicos diários: Referência, Hard e Palavra. Descubra a resposta em seis tentativas. Gratuito e sem cadastro.",
+    "Três modos bíblicos diários: Referência, Difícil e Palavra. Descubra a resposta em seis tentativas. Gratuito e sem cadastro.",
     "Jogar",
   ],
   [
     "estatisticas.html",
     "Estatísticas | Biblio",
-    "Consulte seu histórico, vitórias e sequências nos modos Referência, Hard e Palavra.",
+    "Consulte seu histórico, vitórias e sequências nos modos Referência, Difícil e Palavra.",
     "Estatísticas",
   ],
   [
     "como-jogar.html",
     "Como jogar Biblio",
-    "Aprenda a jogar os modos Referência, Hard e Palavra do Biblio: seis tentativas e pistas por cores.",
+    "Aprenda a jogar os modos Referência, Difícil e Palavra do Biblio: seis tentativas e pistas por cores.",
     "Como jogar",
   ],
   [
@@ -65,7 +65,7 @@ const nav = [
   ["contato.html", "Contato"],
 ];
 const bible = JSON.parse(fs.readFileSync("bible.json", "utf8"));
-const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros nos modos Referência e Hard</caption><thead><tr><th scope="col">Normal</th><th scope="col">Hard</th><th scope="col">Livro</th></tr></thead><tbody>${bible
+const bookTable = `<div class="table-scroll"><table><caption>Siglas dos livros nos modos Referência e Difícil</caption><thead><tr><th scope="col">Normal</th><th scope="col">Difícil</th><th scope="col">Livro</th></tr></thead><tbody>${bible
   .map(
     (b) =>
       `<tr><td>${b.abbrev.replace(/^\d/, "").toUpperCase()}</td><td>${b.abbrev
@@ -85,7 +85,7 @@ const privacy = `<section id="privacy-choices" class="privacy-panel" aria-labell
 </section>`;
 const gameModes = `<nav class="game-modes" aria-label="Modos de jogo"><div class="game-modes-inner">
   <a href="index.html" data-game-mode="referencia" aria-current="page">Referência</a>
-  <a href="index.html?modo=hard" data-game-mode="hard">Hard</a>
+  <a href="index.html?modo=hard" data-game-mode="hard">Difícil</a>
   <a href="index.html?modo=palavra" data-game-mode="palavra">Palavra</a>
 </div></nav>`;
 for (const [file, title, description, active] of pages) {

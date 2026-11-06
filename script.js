@@ -4,7 +4,7 @@ const gameMode = ["palavra", "hard"].includes(requestedMode)
   : "referencia";
 const wordMode = gameMode === "palavra";
 const hardMode = gameMode === "hard";
-const modeTitle = wordMode ? "Palavra" : hardMode ? "Hard" : "Referência";
+const modeTitle = wordMode ? "Palavra" : hardMode ? "Difícil" : "Referência";
 const storage = wordMode
   ? { state: "biblio-palavra-state", stats: "biblio-palavra-stats" }
   : hardMode
@@ -231,12 +231,14 @@ function setState() {
     !validProgress(state) ||
     Date.now() >= state.expirationTime ||
     !state.expirationTime ||
-    state.translation !== "blivre-2018"
+    state.translation !== "blivre-2018" ||
+    (hardMode && state.referenceDrawVersion !== 2)
   ) {
     localStorage.setItem(
       storage.state,
       JSON.stringify({
         translation: "blivre-2018",
+        referenceDrawVersion: 2,
         currentRow: 0,
         currentColumn: 0,
         grid: Array(global.chances)
@@ -932,7 +934,33 @@ function getSequentialNumber() {
 async function getRandomVerse() {
   const actualDate = getUserDate().toISOString().slice(0, 10);
   const hash = await sha256(actualDate);
+  const normal = referenceFromHash(hash);
+  if (!hardMode) return normal;
 
+  // Excluir a referência normal garante a diferença mesmo se os hashes colidirem.
+  const alternatives = Object.entries(bible)
+    .flatMap(([book, chapters]) =>
+      chapters.flatMap(({ chapter, versicles }) =>
+        Array.from({ length: versicles }, (_, i) => ({
+          book,
+          chapter,
+          verse: i + 1,
+        })),
+      ),
+    )
+    .filter(
+      ({ book, chapter, verse }) =>
+        book !== normal.book ||
+        chapter !== normal.chapter ||
+        verse !== normal.verse,
+    );
+  // Sem alternativas, o corpus só permite uma referência.
+  if (!alternatives.length) return normal;
+  const hardHash = await sha256(`${actualDate}:hard-v2`);
+  return alternatives[parseInt(hardHash.slice(0, 8), 16) % alternatives.length];
+}
+
+function referenceFromHash(hash) {
   const books = Object.keys(bible);
 
   // Convert part of the hash to decide the book index

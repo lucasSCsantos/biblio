@@ -5,7 +5,7 @@
     ? requestedMode
     : "referencia";
   const title =
-    mode === "palavra" ? "Palavra" : mode === "hard" ? "Hard" : "Referência";
+    mode === "palavra" ? "Palavra" : mode === "hard" ? "Difícil" : "Referência";
   const today = new Date();
   const challengeDay = new Date(
     today.getTime() - today.getTimezoneOffset() * 60000,
