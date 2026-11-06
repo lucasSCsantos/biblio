@@ -27,7 +27,8 @@ function setBackgroundInert(inert) {
 }
 
 function closeStats() {
-  document.getElementById("modal").classList.add("hidden");
+  const modal = document.getElementById("modal");
+  modal.classList.add("hidden");
   setBackgroundInert(false);
   dialogOpener?.focus();
   document.dispatchEvent(new Event("biblio:stats-closed"));
@@ -750,7 +751,7 @@ function showAnswer() {
   tag.setAttribute("role", "status");
   tagText.textContent = answer;
   tag.appendChild(tagText);
-  document.getElementById("game").appendChild(tag);
+  document.getElementById("modal").prepend(tag);
 }
 
 function showAlert(alert) {
@@ -1058,6 +1059,8 @@ function showStatsModal(source = "automatic") {
   }
 
   dialogOpener = document.activeElement;
+  const answer = document.getElementById("tag");
+  if (played && answer) modal.prepend(answer);
   modal.classList.remove("hidden");
   setBackgroundInert(true);
   modal.querySelector("[data-close-dialog]").focus();

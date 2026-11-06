@@ -19,6 +19,8 @@ npm run dev
 
 Acesse http://127.0.0.1:4173. Use HTTP em vez de abrir `index.html` diretamente: o navegador precisa carregar `bible.json` por fetch.
 
+Para testar no celular conectado à mesma rede, use `npm run dev:lan` e abra um dos IPs mostrados no terminal (porta 4175 por padrão). Esse comando é exclusivo de desenvolvimento e recusa `NODE_ENV=production`. Escutar fora de localhost também exige `allowLan: true` e `NODE_ENV=development` no servidor. O auxiliar de SHA-256 para HTTP é injetado somente na resposta desse servidor; os arquivos estáticos publicados e o Worker não o incluem.
+
 Edite os textos em `content/`; o cabeçalho, rodapé e metadados ficam em `scripts/build-pages.mjs`. Execute o build depois das alterações e publique os HTML gerados. Veja [configuração de comparações](docs/comparisons-deployment.md), [eventos de Analytics](docs/analytics.md) e os detalhes de anúncios em [docs/adsense.md](docs/adsense.md).
 
 ## Verificação
@@ -26,7 +28,12 @@ Edite os textos em `content/`; o cabeçalho, rodapé e metadados ficam em `scrip
 ```sh
 npm run check
 npm test
+npm run test:mobile
 ```
+
+O ajuste móvel preserva cabeçalho, seletor de modos, linha de ações, passagem, seis tentativas e teclado. `mobile-game-layout.js` prioriza o versículo inteiro e legível, sem rolagem interna, antes de dimensionar tabuleiro e teclado. Quando a passagem não cabe fisicamente junto aos controles, a página pode crescer e rolar. O recuo inferior do teclado acompanha o recuo das bordas laterais, respeitando as áreas seguras. Em telas horizontais, o teclado fica ao lado da passagem e do tabuleiro. As notas e o restante da página seguem abaixo, sem serem ocultados. Ao concluir, a referência correta aparece na caixa azul acima do painel de resultados.
+
+`npm run test:mobile` verifica Chromium, WebKit e Firefox, incluindo telas estreitas, rotação, barras abertas e margens de segurança simuladas. Instale os motores adicionais com `npx playwright install webkit firefox`. Esses testes não substituem a conferência em um aparelho físico.
 
 Os testes de navegador requerem `npx playwright install chromium`. As ferramentas ficam restritas ao desenvolvimento.
 

@@ -4,8 +4,10 @@
   "scripts": {
     "build": "node scripts/build-pages.mjs",
     "dev": "node scripts/serve.mjs",
-    "check": "node --check script.js && node --check word-game.js && node --check mode-intro.js && node --check results-client.js && node --check statistics.js && node --check worker/index.mjs && node --check site.js && node --check site-config.js && node --check bible-index.js && node --check scripts/build-pages.mjs && node --check scripts/import-bible.mjs && node --check scripts/serve.mjs && node scripts/check-site.mjs",
-    "test": "playwright test"
+    "check": "node --check script.js && node --check mobile-game-layout.js && node --check word-game.js && node --check mode-intro.js && node --check results-client.js && node --check statistics.js && node --check worker/index.mjs && node --check site.js && node --check site-config.js && node --check bible-index.js && node --check scripts/build-pages.mjs && node --check scripts/import-bible.mjs && node --check scripts/serve.mjs && node --check scripts/serve-lan.mjs && node scripts/check-site.mjs",
+    "test": "playwright test",
+    "dev:lan": "node scripts/serve-lan.mjs",
+    "test:mobile": "playwright test --config=playwright.mobile.config.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -101,7 +101,7 @@ for (const [file, title, description, active] of pages) {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1${home ? ", viewport-fit=cover" : ""}">
   <title>${title}</title>
   <meta name="description" content="${description}">
   <meta property="og:title" content="${title}">
@@ -115,7 +115,7 @@ for (const [file, title, description, active] of pages) {
   <link rel="stylesheet" href="styles.css">
   <script src="site-config.js" defer></script>
   <script src="site.js" defer></script>
-${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="mode-intro.js" defer></script>\n  <script src="results-client.js" defer></script>\n  <script src="script.js" defer></script>' : file === "estatisticas.html" ? '  <script src="results-client.js" defer></script>\n  <script src="statistics.js" defer></script>' : ""}
+${home ? '  <script src="bible-index.js" defer></script>\n  <script src="word-game.js" defer></script>\n  <script src="mode-intro.js" defer></script>\n  <script src="results-client.js" defer></script>\n  <script src="mobile-game-layout.js" defer></script>\n  <script src="script.js" defer></script>' : file === "estatisticas.html" ? '  <script src="results-client.js" defer></script>\n  <script src="statistics.js" defer></script>' : ""}
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>

@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Miniflare } from "miniflare";
+import { createHash } from "node:crypto";
 
 const root = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
 const mime = {
@@ -18,11 +19,17 @@ const mime = {
 };
 export async function createSiteServer({
   port = Number(process.env.BIBLIO_PORT || 4173),
+  host = "127.0.0.1",
+  allowLan = false,
   persist = false,
   results = true,
   beforeMigration,
   afterMigration,
 } = {}) {
+  const loopback = ["127.0.0.1", "localhost", "::1"].includes(host);
+  const lanDevelopment = allowLan && process.env.NODE_ENV === "development";
+  if (!loopback && !lanDevelopment)
+    throw new Error("Acesso LAN exige NODE_ENV=development e allowLan=true.");
   const runtime = results
     ? new Miniflare({
         host: "127.0.0.1",
@@ -54,6 +61,22 @@ export async function createSiteServer({
   const server = http.createServer(async (request, response) => {
     try {
       const url = new URL(request.url, "http://localhost");
+      // Web Crypto exige contexto seguro. O teste por IP em HTTP usa o mesmo SHA-256 no Node.
+      if (lanDevelopment && url.pathname === "/__dev/sha256") {
+        const message = url.searchParams.get("message") || "";
+        response.writeHead(message.length > 1024 ? 400 : 200, {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        });
+        response.end(
+          JSON.stringify(
+            message.length > 1024
+              ? null
+              : createHash("sha256").update(message).digest("hex"),
+          ),
+        );
+        return;
+      }
       if (url.pathname.startsWith("/api/")) {
         if (!runtime) {
           response.writeHead(503);
@@ -108,6 +131,15 @@ export async function createSiteServer({
       if (!file.startsWith(root + path.sep))
         throw new Error("Caminho inválido");
       let data = await fs.readFile(file);
+      if (lanDevelopment && resource === "/script.js")
+        data = Buffer.from(
+          data
+            .toString()
+            .replace(
+              "async function sha256(message) {",
+              'async function sha256(message) { if (!globalThis.crypto?.subtle) { const response = await fetch("/__dev/sha256?message=" + encodeURIComponent(message)); if (!response.ok) throw new Error("Sorteio indisponível"); return response.json(); }',
+            ),
+        );
       if (resource === "/site-config.js" && results)
         data = Buffer.from(
           data
@@ -126,7 +158,7 @@ export async function createSiteServer({
   });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    server.listen(port, "127.0.0.1", resolve);
+    server.listen(port, host, resolve);
   });
   return {
     url: `http://127.0.0.1:${server.address().port}`,
